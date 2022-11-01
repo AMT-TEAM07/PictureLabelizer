@@ -17,12 +17,6 @@ public class AwsDataObjectHelperImpl {
                 .build();
     }
 
-    public AwsDataObjectHelperImpl(String bucketUrl) {
-    }
-
-    public AwsDataObjectHelperImpl() {
-    }
-
     public void Create(String objectname) {
     }
 

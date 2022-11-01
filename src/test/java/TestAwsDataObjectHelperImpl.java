@@ -1,7 +1,9 @@
+import io.github.cdimascio.dotenv.Dotenv;
 import org.amt.team07.helpers.dataObjects.AwsDataObjectHelperImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 
 import java.io.File;
 
@@ -10,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestAwsDataObjectHelperImpl {
 
     private AwsDataObjectHelperImpl bucketManager;
+
+    private ProfileCredentialsProvider credentialsProvider;
     private String domain;
     private String bucketName;
     private String bucketUrl;
@@ -21,23 +25,25 @@ class TestAwsDataObjectHelperImpl {
     @BeforeEach
     public void Init()
     {
+        Dotenv dotenv = Dotenv.load();
         this.pathToTestFolder = System.getProperty("user.dir").replace("bin\\Debug\\netcoreapp3.1", "testData");
-        this.bucketName = "testbucket";
+        this.bucketName = dotenv.get("AWS_BUCKET");
         this.domain = "aws.dev.actualit.info";
         this.bucketUrl = bucketName + "." + this.domain;
         this.imageName = "emiratesa380.jpg";
         this.fullPathToImage = pathToTestFolder + "\\" + imageName;
         this.prefixObjectDownloaded = "downloaded";
-        this.bucketManager = new AwsDataObjectHelperImpl(this.bucketUrl);
+        this.credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
+
+        this.bucketManager = new AwsDataObjectHelperImpl(credentialsProvider, bucketUrl);
     }
 
     @Test
-     void CreateObject_CreateNewBucket_Success()
-    {
+     void CreateObject_CreateNewBucket_Success() {
         assertFalse(this.bucketManager.Exists(bucketUrl));
 
         this.bucketManager.Create(bucketUrl);
-        
+
         assertTrue(this.bucketManager.Exists(bucketUrl));
     }
 
@@ -180,7 +186,7 @@ class TestAwsDataObjectHelperImpl {
             file.delete();
         }
 
-        this.bucketManager = new AwsDataObjectHelperImpl(this.bucketUrl);
+        this.bucketManager = new AwsDataObjectHelperImpl(this.credentialsProvider, this.bucketUrl);
         if (this.bucketManager.Exists(bucketUrl))
         {
             this.bucketManager.RemoveObject(this.bucketUrl);
