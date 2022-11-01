@@ -1,8 +1,12 @@
 package org.amt.team07.helpers.dataObjects;
 
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
+
+import java.nio.file.Path;
 
 public class AwsDataObjectHelperImpl {
 
@@ -17,19 +21,49 @@ public class AwsDataObjectHelperImpl {
                 .build();
     }
 
-    public void Create(String objectname) {
+    public void CreateObject(String objectName, Path filePath) {
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
+                .bucket(this.bucketName)
+                .key(objectName)
+                .build();
+
+        s3.putObject(objectRequest, RequestBody.fromFile(filePath));
     }
 
-    public void Create(String objectname, String path) {
+    public boolean ExistsBucket(String bucketName) {
+        HeadBucketRequest headBucketRequest = HeadBucketRequest.builder()
+                .bucket(bucketName)
+                .build();
+        try {
+            s3.headBucket(headBucketRequest);
+            return true;
+        } catch (NoSuchBucketException e) {
+            return false;
+        }
     }
 
-    public boolean Exists(String objectname) {
-        return false;
+    public boolean ExistsObject(String objectName) {
+        HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                .bucket(bucketName)
+                .key(objectName)
+                .build();
+        try {
+            s3.headObject(headObjectRequest);
+            return true;
+        } catch (NoSuchKeyException e) {
+            return false;
+        }
     }
 
     public void DownloadObject(String objectUrl, String destinationFullPath) {
+        // TODO
     }
 
-    public void RemoveObject(String bucketUrl) {
+    public void RemoveObject(String objectName) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(this.bucketName)
+                .key(objectName)
+                .build();
+        s3.deleteObject(deleteObjectRequest);
     }
 }
