@@ -15,22 +15,22 @@ public class AwsDataObjectHelperImpl {
 
     public AwsDataObjectHelperImpl(ProfileCredentialsProvider credentialsProvider, String bucketName) {
         this.bucketName = bucketName;
-        this.s3 = S3Client.builder()
+        s3 = S3Client.builder()
                 .region(Region.EU_WEST_2)
                 .credentialsProvider(credentialsProvider)
                 .build();
     }
 
-    public void CreateObject(String objectName, Path filePath) {
+    public void createObject(String objectName, Path filePath) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
-                .bucket(this.bucketName)
+                .bucket(bucketName)
                 .key(objectName)
                 .build();
 
         s3.putObject(objectRequest, RequestBody.fromFile(filePath));
     }
 
-    public boolean ExistsBucket(String bucketName) {
+    public boolean existsBucket(String bucketName) {
         HeadBucketRequest headBucketRequest = HeadBucketRequest.builder()
                 .bucket(bucketName)
                 .build();
@@ -42,7 +42,7 @@ public class AwsDataObjectHelperImpl {
         }
     }
 
-    public boolean ExistsObject(String objectName) {
+    public boolean existsObject(String objectName) {
         HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
                 .bucket(bucketName)
                 .key(objectName)
@@ -55,15 +55,20 @@ public class AwsDataObjectHelperImpl {
         }
     }
 
-    public void DownloadObject(String objectUrl, String destinationFullPath) {
-        // TODO
-    }
-
-    public void RemoveObject(String objectName) {
+    public void removeObject(String objectName) {
         DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                .bucket(this.bucketName)
+                .bucket(bucketName)
                 .key(objectName)
                 .build();
         s3.deleteObject(deleteObjectRequest);
+    }
+
+    public void downloadObject(String objectUrl, String destinationFullPath) {
+        // TODO
+    }
+
+    public String getObjectPrivateUrl(String objectName) {
+        // TODO
+        return null;
     }
 }
