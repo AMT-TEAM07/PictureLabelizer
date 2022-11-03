@@ -63,8 +63,17 @@ public class AwsDataObjectHelperImpl {
         s3.deleteObject(deleteObjectRequest);
     }
 
-    public void downloadObject(String objectUrl, String destinationFullPath) {
-        // TODO
+    public boolean downloadObject(String objectUrl, Path downloadedImagePath) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(objectUrl)
+                .build();
+        try {
+            s3.getObject(getObjectRequest, downloadedImagePath);
+            return true;
+        } catch (NoSuchKeyException e) {
+            return false;
+        }
     }
 
     public String getObjectPrivateUrl(String objectName) {

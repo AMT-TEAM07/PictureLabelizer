@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -16,22 +17,24 @@ class TestAwsDataObjectHelperImpl {
     private ProfileCredentialsProvider credentialsProvider;
     private String bucketName;
     private Path testImagePath;
+
+    private Path downloadedImagePath;
     private String objectName;
 
     @BeforeEach
-    public void Init() {
+    public void setup() {
         Dotenv dotenv = Dotenv.load();
 
         bucketName = dotenv.get("AWS_BUCKET");
         objectName = "test-image.png";
         testImagePath = Paths.get("src", "test", "resources", objectName);
-
+        downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
         credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
         bucketManager = new AwsDataObjectHelperImpl(credentialsProvider, bucketName);
     }
 
     @Test
-    void CreateObject_CreateObjectWithExistingBucket_Success() {
+    void createObject_CreateObjectWithExistingBucket_Success() {
         //given
         assertTrue(bucketManager.existsBucket(bucketName));
         assertFalse(bucketManager.existsObject(objectName));
@@ -44,7 +47,7 @@ class TestAwsDataObjectHelperImpl {
     }
 
     @Test
-    void ExistsBucket_NominalCase_Success() {
+    void existsBucket_NominalCase_Success() {
         //given
         String existingBucket = bucketName;
         boolean actualResult;
@@ -57,7 +60,7 @@ class TestAwsDataObjectHelperImpl {
     }
 
     @Test
-    void ExistsBucket_NotExistBucket_Success() {
+    void existsBucket_NotExistBucket_Success() {
         //given
         String notExistingBucket = "notExistingBucket-" + bucketName;
         boolean actualResult;
@@ -70,7 +73,7 @@ class TestAwsDataObjectHelperImpl {
     }
 
     @Test
-    void ExistsObject_NominalCase_Success() {
+    void existsObject_NominalCase_Success() {
         //given
         bucketManager.createObject(objectName, testImagePath);
         boolean actualResult;
@@ -83,7 +86,7 @@ class TestAwsDataObjectHelperImpl {
     }
 
     @Test
-    void ExistsObject_NotExistObject_Success() {
+    void existsObject_NotExistObject_Success() {
         //given
         String notExistingFileName = "notExistingFile.jpg";
         assertTrue(bucketManager.existsBucket(bucketName));
@@ -98,7 +101,7 @@ class TestAwsDataObjectHelperImpl {
 
 
     @Test
-    void RemoveObject_EmptyBucket_Success() {
+    void removeObject_EmptyBucket_Success() {
         //given
         assertTrue(bucketManager.existsBucket(bucketName));
         assertFalse(bucketManager.existsObject(objectName));
@@ -111,7 +114,7 @@ class TestAwsDataObjectHelperImpl {
     }
 
     @Test
-    void RemoveObject_NotEmptyBucket_Success() {
+    void removeObject_NotEmptyBucket_Success() {
         //given
         assertTrue(bucketManager.existsBucket(bucketName));
         bucketManager.createObject(objectName, testImagePath);
@@ -124,30 +127,44 @@ class TestAwsDataObjectHelperImpl {
         assertFalse(bucketManager.existsObject(objectName));
     }
 
-//    @Test
-//    void DownloadObject_NominalCase_Success() {
-//        //given
-//        bucketManager.CreateObject(objectName, testImagePath);
-//
-//        assertTrue(bucketManager.ExistsObject(objectName));
-//
-//        //when
-//        bucketManager.DownloadObject(objectName, destinationFullPath);
-//
-//        //then
-//        File file = new File(destinationFullPath);
-//        assertTrue(file.exists());
-//    }
+    @Test
+    void downloadObject_NominalCase_Success() {
+        //given
+        bucketManager.createObject(objectName, testImagePath);
+        assertTrue(bucketManager.existsObject(objectName));
+        boolean actualResult;
+
+        //when
+        actualResult = bucketManager.downloadObject(objectName, downloadedImagePath);
+
+        //then
+        assertTrue(actualResult);
+        File file = new File(downloadedImagePath.toUri());
+        assertTrue(file.exists());
+    }
+
+    @Test
+    void downloadObject_NotExistObject_Success() {
+        //given
+        assertFalse(bucketManager.existsObject(objectName));
+        boolean actualResult;
+
+        //when
+        actualResult = bucketManager.downloadObject(objectName, downloadedImagePath);
+
+        //then
+        assertFalse(actualResult);
+        File file = new File(downloadedImagePath.toUri());
+        assertFalse(file.exists());
+    }
 
 
     @AfterEach
-    void Cleanup() {
-//        String destinationFullPath = this.pathToTestFolder + "\\" + this.prefixObjectDownloaded + this.imageName;
-//
-//        File file = new File(destinationFullPath);
-//        if (file.exists()) {
-//            file.delete();
-//        }
+    void tearDown() {
+        File file = new File(downloadedImagePath.toUri());
+        if (file.exists()) {
+            System.out.println("Deleting file => " + file.delete());
+        }
         this.bucketManager = new AwsDataObjectHelperImpl(this.credentialsProvider, this.bucketName);
         if (this.bucketManager.existsObject(this.objectName)) {
             this.bucketManager.removeObject(this.objectName);
