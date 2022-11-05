@@ -17,13 +17,14 @@ class TestAwsDataObjectHelperImpl {
     private ProfileCredentialsProvider credentialsProvider;
     private String bucketName;
     private Path testImagePath;
-
     private Path downloadedImagePath;
     private String objectName;
 
     @BeforeEach
     public void setup() {
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
 
         bucketName = dotenv.get("AWS_BUCKET");
         objectName = "test-image.png";

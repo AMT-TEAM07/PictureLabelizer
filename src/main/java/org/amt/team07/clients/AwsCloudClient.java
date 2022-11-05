@@ -15,7 +15,9 @@ public class AwsCloudClient {
     private AwsLabelDetectorHelperImpl labelDetectorHelper;
 
     private AwsCloudClient() {
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
         credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
         dataObjectHelper = new AwsDataObjectHelperImpl(credentialsProvider, dotenv.get("AWS_BUCKET"));
         labelDetectorHelper = new AwsLabelDetectorHelperImpl(credentialsProvider);
