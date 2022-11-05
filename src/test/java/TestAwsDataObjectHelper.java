@@ -1,9 +1,11 @@
 import io.github.cdimascio.dotenv.Dotenv;
-import org.amt.team07.helpers.dataObjects.AwsDataObjectHelperImpl;
+import org.amt.team07.helpers.dataObjects.AwsDataObjectHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -11,26 +13,34 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestAwsDataObjectHelperImpl {
+class TestAwsDataObjectHelper {
 
-    private AwsDataObjectHelperImpl bucketManager;
-    private ProfileCredentialsProvider credentialsProvider;
+    private AwsDataObjectHelper bucketManager;
+    private AwsCredentialsProvider credentialsProvider;
+    private String region;
     private String bucketName;
     private Path testImagePath;
-
     private Path downloadedImagePath;
     private String objectName;
 
     @BeforeEach
     public void setup() {
-        Dotenv dotenv = Dotenv.load();
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .systemProperties()
+                .load();
 
+        AwsBasicCredentials credentials = AwsBasicCredentials
+                .create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
+        credentialsProvider = StaticCredentialsProvider.create(credentials);
+
+        region = dotenv.get("AWS_DEFAULT_REGION");
         bucketName = dotenv.get("AWS_BUCKET");
         objectName = "test-image.png";
         testImagePath = Paths.get("src", "test", "resources", objectName);
         downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
-        credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
-        bucketManager = new AwsDataObjectHelperImpl(credentialsProvider, bucketName);
+
+        bucketManager = new AwsDataObjectHelper(credentialsProvider, region, bucketName);
     }
 
     @Test
@@ -178,9 +188,9 @@ class TestAwsDataObjectHelperImpl {
         if (file.exists()) {
             System.out.println("Deleting file => " + file.delete());
         }
-        this.bucketManager = new AwsDataObjectHelperImpl(this.credentialsProvider, this.bucketName);
-        if (this.bucketManager.existsObject(this.objectName)) {
-            this.bucketManager.removeObject(this.objectName);
+        bucketManager = new AwsDataObjectHelper(credentialsProvider, region, bucketName);
+        if (bucketManager.existsObject(objectName)) {
+            bucketManager.removeObject(objectName);
         }
     }
 }
