@@ -24,10 +24,16 @@ public class AwsLabelDetectorHelperImpl {
     }
 
     public List<LabelWrapper> Execute(String imageUri, int nbLabels, double minConfidence) {
+        if (nbLabels < 1) {
+            throw new InvalidParameterException("nbLabels must be at least 1");
+        }
+        if (minConfidence < 0 || minConfidence > 100) {
+            throw new InvalidParameterException("minConfidence must be between 0 and 100");
+        }
         List<Label> awsLabels = getLabelsfromImage(imageUri, nbLabels, minConfidence);
         return LabelWrapper.from(awsLabels);
     }
-
+    
     private List<Label> getLabelsfromImage(String image, int nbLabels, double minConfidence) {
         try {
             Image myImage = Image.builder()
