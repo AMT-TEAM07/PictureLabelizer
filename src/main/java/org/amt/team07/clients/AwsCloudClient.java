@@ -2,11 +2,9 @@ package org.amt.team07.clients;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.amt.team07.helpers.dataObjects.AwsDataObjectHelperImpl;
-import org.amt.team07.helpers.labelDetectors.AwsLabelDetectorHelperImpl;
+import org.amt.team07.helpers.labelDetectors.AwsLabelDetectorHelper;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -20,13 +18,13 @@ public class AwsCloudClient {
 
     private AwsDataObjectHelperImpl dataObjectHelper;
 
-    private AwsLabelDetectorHelperImpl labelDetectorHelper;
+    private AwsLabelDetectorHelper labelDetectorHelper;
 
     private AwsCloudClient() {
         Dotenv dotenv = Dotenv.load();
         credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
         dataObjectHelper = new AwsDataObjectHelperImpl(credentialsProvider, dotenv.get("AWS_BUCKET"));
-        labelDetectorHelper = new AwsLabelDetectorHelperImpl(credentialsProvider);
+        labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider);
     }
 
     /**

@@ -1,5 +1,5 @@
 import io.github.cdimascio.dotenv.Dotenv;
-import org.amt.team07.helpers.labelDetectors.AwsLabelDetectorHelperImpl;
+import org.amt.team07.helpers.labelDetectors.AwsLabelDetectorHelper;
 import org.amt.team07.helpers.labelDetectors.LabelWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLabelDetector {
     private ProfileCredentialsProvider credentialsProvider;
-    private AwsLabelDetectorHelperImpl labelDetectorHelper;
+    private AwsLabelDetectorHelper labelDetectorHelper;
 
     @BeforeEach
     public void init()
     {
         Dotenv dotenv = Dotenv.load();
         credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
-        labelDetectorHelper = new AwsLabelDetectorHelperImpl(credentialsProvider);
+        labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider);
     }
 
     @Test

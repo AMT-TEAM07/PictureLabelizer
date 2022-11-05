@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.security.InvalidParameterException;
 import java.util.List;
 
-public class AwsLabelDetectorHelperImpl {
+public class AwsLabelDetectorHelper {
 
     private final RekognitionClient rekClient;
 
@@ -20,7 +20,7 @@ public class AwsLabelDetectorHelperImpl {
      * Constructor for the AWS label detector helper
      * @param credentialsProvider the credentials provider to use
      */
-    public AwsLabelDetectorHelperImpl(ProfileCredentialsProvider credentialsProvider) {
+    public AwsLabelDetectorHelper(ProfileCredentialsProvider credentialsProvider) {
         rekClient = RekognitionClient.builder()
                 .region(Region.EU_WEST_2)
                 .credentialsProvider(credentialsProvider)
