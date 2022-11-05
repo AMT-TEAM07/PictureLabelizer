@@ -21,10 +21,22 @@ public class AwsCloudClient {
         labelDetectorHelper = new AwsLabelDetectorHelperImpl(credentialsProvider);
     }
 
+    /**
+     * Get a list of labels from a URL of a picture
+     * @param image the image to analyze
+     * @param nbLabels the maximum number of labels to return
+     * @param minConfidence the minimum confidence for a label to be returned
+     */
     public void rekognitionFromURL(String image, int nbLabels, double minConfidence) {
         System.out.println(labelDetectorHelper.execute(image, nbLabels, minConfidence));
     }
 
+    /**
+     * Get a list of labels from an image in base 64
+     * @param image the image to analyze
+     * @param nbLabels the maximum number of labels to return
+     * @param minConfidence the minimum confidence for a label to be returned
+     */
     public void rekognitionFromBase64(String image, int nbLabels, double minConfidence) {
         System.out.println(labelDetectorHelper.executeB64(image, nbLabels, minConfidence));
     }
