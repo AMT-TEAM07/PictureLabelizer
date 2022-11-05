@@ -46,7 +46,6 @@ public class AwsCloudClient {
             suffix = ",";
         }
         json.append("]}");
-        System.out.println(json.toString());
 
         //Ecriture du json dans un fichier
         String name = myName + ".json";
@@ -57,8 +56,6 @@ public class AwsCloudClient {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println(json.toString());
     }
 
     /**
