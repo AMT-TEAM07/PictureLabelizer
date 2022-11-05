@@ -21,6 +21,10 @@ public class AwsCloudClient {
         labelDetectorHelper = new AwsLabelDetectorHelperImpl(credentialsProvider);
     }
 
+    public void executeRekog(String image, int[] params) {
+        System.out.println(labelDetectorHelper.Execute(image, params));
+    }
+
     public static AwsCloudClient getInstance() {
         if (instance == null) {
             instance = new AwsCloudClient();
