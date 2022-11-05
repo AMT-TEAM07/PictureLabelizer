@@ -1,5 +1,5 @@
 import io.github.cdimascio.dotenv.Dotenv;
-import org.amt.team07.helpers.dataObjects.AwsDataObjectHelper;
+import org.amt.team07.helpers.objects.AwsDataObjectHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,8 +37,8 @@ class TestAwsDataObjectHelper {
         region = dotenv.get("AWS_DEFAULT_REGION");
         bucketName = dotenv.get("AWS_BUCKET");
         objectName = "test-image.png";
-        testImagePath = Paths.get("src", "test", "resources", objectName);
-        downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
+        testImagePath = Paths.get("src", "test", "src/main/resources", objectName);
+        downloadedImagePath = Paths.get("src", "test", "src/main/resources", "downloaded-" + objectName);
 
         bucketManager = new AwsDataObjectHelper(credentialsProvider, region, bucketName);
     }

@@ -1,4 +1,4 @@
-package org.amt.team07.helpers.dataObjects;
+package org.amt.team07.helpers.objects;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;

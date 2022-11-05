@@ -1,8 +1,8 @@
 package org.amt.team07.clients;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.amt.team07.helpers.dataObjects.AwsDataObjectHelper;
-import org.amt.team07.helpers.labelDetectors.AwsLabelDetectorHelper;
+import org.amt.team07.helpers.objects.AwsDataObjectHelper;
+import org.amt.team07.helpers.labels.AwsLabelDetectorHelper;
 import software.amazon.awssdk.auth.credentials.*;
 
 import java.io.IOException;
@@ -33,6 +33,12 @@ public class AwsCloudClient {
         labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"));
     }
 
+    public void analyzeFromPath(String objectName, int nbLabels, double minConfidence, Path path) throws IOException {
+        dataObjectHelper.createObject(objectName, path);
+        String url = dataObjectHelper.getPresignedUrl(objectName);
+        analyzeFromURL(url, objectName, nbLabels, minConfidence);
+    }
+
     /**
      * Get a list of labels from a URL of a picture
      * @param image the image to analyze
@@ -40,7 +46,7 @@ public class AwsCloudClient {
      * @param nbLabels the maximum number of labels to return
      * @param minConfidence the minimum confidence for a label to be returned
      */
-    public void rekognitionFromURL(String image, String myName, int nbLabels, double minConfidence) {
+    public void analyzeFromURL(String image, String myName, int nbLabels, double minConfidence) throws IOException {
         //Création de la string json
         StringBuilder json = new StringBuilder("{labels:[");
         String suffix = "";
@@ -53,13 +59,11 @@ public class AwsCloudClient {
 
         //Ecriture du json dans un fichier
         String name = myName + ".json";
-        try {
-            Path file = Paths.get(name);
-            Files.writeString(file, json.toString(), StandardCharsets.UTF_8);
-            dataObjectHelper.createObject(name, file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        Path path = Paths.get(name);
+        Files.writeString(path, json.toString(), StandardCharsets.UTF_8);
+        dataObjectHelper.createObject(name, path);
+        Files.delete(path);
     }
 
     /**
@@ -68,7 +72,7 @@ public class AwsCloudClient {
      * @param nbLabels the maximum number of labels to return
      * @param minConfidence the minimum confidence for a label to be returned
      */
-    public void rekognitionFromBase64(String image, int nbLabels, double minConfidence) {
+    public void analyzeFromBase64(String image, int nbLabels, double minConfidence) {
         System.out.println(labelDetectorHelper.executeB64(image, nbLabels, minConfidence));
     }
 

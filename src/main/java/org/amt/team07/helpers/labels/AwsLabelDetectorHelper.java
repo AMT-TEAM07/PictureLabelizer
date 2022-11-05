@@ -1,4 +1,4 @@
-package org.amt.team07.helpers.labelDetectors;
+package org.amt.team07.helpers.labels;
 
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;

@@ -1,6 +1,6 @@
 import io.github.cdimascio.dotenv.Dotenv;
-import org.amt.team07.helpers.labelDetectors.AwsLabelDetectorHelper;
-import org.amt.team07.helpers.labelDetectors.LabelWrapper;
+import org.amt.team07.helpers.labels.AwsLabelDetectorHelper;
+import org.amt.team07.helpers.labels.LabelWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;

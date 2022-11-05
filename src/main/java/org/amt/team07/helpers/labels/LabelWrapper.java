@@ -1,4 +1,4 @@
-package org.amt.team07.helpers.labelDetectors;
+package org.amt.team07.helpers.labels;
 
 import software.amazon.awssdk.services.rekognition.model.Label;
 

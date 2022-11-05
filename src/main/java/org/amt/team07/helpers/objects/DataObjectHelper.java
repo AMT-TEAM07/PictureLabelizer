@@ -1,4 +1,4 @@
-package org.amt.team07.helpers.dataObjects;
+package org.amt.team07.helpers.objects;
 
 import java.nio.file.Path;
 
