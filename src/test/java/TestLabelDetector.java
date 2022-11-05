@@ -3,46 +3,51 @@ import org.amt.team07.helpers.labelDetectors.AwsLabelDetectorHelper;
 import org.amt.team07.helpers.labelDetectors.LabelWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.services.rekognition.model.RekognitionException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestLabelDetector {
-    private ProfileCredentialsProvider credentialsProvider;
+class TestLabelDetector {
+    private AwsCredentialsProvider credentialsProvider;
     private AwsLabelDetectorHelper labelDetectorHelper;
 
     @BeforeEach
-    public void init()
-    {
-        Dotenv dotenv = Dotenv.load();
-        credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
-        labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider);
+    public void setup() {
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .systemProperties()
+                .load();
+
+        AwsBasicCredentials credentials = AwsBasicCredentials
+                .create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
+        credentialsProvider = StaticCredentialsProvider.create(credentials);
+
+        labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"));
     }
 
     @Test
-    public void crashIfURLIsInvalid()
-    {
+    void crashIfURLIsInvalid() {
         assertThrows(RekognitionException.class, () -> labelDetectorHelper.execute("https://www.google.com", 10, 0.5));
     }
 
     @Test
-    public void crashIfNbLabelsIsNegative()
-    {
+    void crashIfNbLabelsIsNegative() {
         assertThrows(IllegalArgumentException.class, () -> labelDetectorHelper.execute("https://a.cdn-hotels.com/gdcs/production196/d1429/5c2581f0-c31d-11e8-87bb-0242ac11000d.jpg?impolicy=fcrop&w=800&h=533&q=medium", -1, 0.5));
     }
 
     @Test
-    public void crashIfMinConfidenceIsNegative()
-    {
+    void crashIfMinConfidenceIsNegative() {
         assertThrows(IllegalArgumentException.class, () -> labelDetectorHelper.execute("https://a.cdn-hotels.com/gdcs/production196/d1429/5c2581f0-c31d-11e8-87bb-0242ac11000d.jpg?impolicy=fcrop&w=800&h=533&q=medium", 10, -0.5));
     }
 
     @Test
-    public void crashIfMinConfidenceIsOver100()
-    {
+    void crashIfMinConfidenceIsOver100() {
         assertThrows(IllegalArgumentException.class, () -> labelDetectorHelper.execute("https://a.cdn-hotels.com/gdcs/production196/d1429/5c2581f0-c31d-11e8-87bb-0242ac11000d.jpg?impolicy=fcrop&w=800&h=533&q=medium", 10, 100.5));
     }
 

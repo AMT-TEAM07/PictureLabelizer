@@ -30,7 +30,7 @@ public class AwsCloudClient {
         credentialsProvider = StaticCredentialsProvider.create(credentials);
         dataObjectHelper = new AwsDataObjectHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"),
                 dotenv.get("AWS_BUCKET"));
-        labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider);
+        labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"));
     }
 
     /**
