@@ -6,190 +6,181 @@ import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestAwsDataObjectHelperImpl {
 
     private AwsDataObjectHelperImpl bucketManager;
-
     private ProfileCredentialsProvider credentialsProvider;
-    private String domain;
     private String bucketName;
-    private String bucketUrl;
-    private String imageName;
-    private String pathToTestFolder;
-    private String fullPathToImage;
-    private String prefixObjectDownloaded;
+    private Path testImagePath;
+
+    private Path downloadedImagePath;
+    private String objectName;
 
     @BeforeEach
-    public void Init()
-    {
+    public void setup() {
         Dotenv dotenv = Dotenv.load();
-        this.pathToTestFolder = System.getProperty("user.dir").replace("bin\\Debug\\netcoreapp3.1", "testData");
-        this.bucketName = dotenv.get("AWS_BUCKET");
-        this.domain = "aws.dev.actualit.info";
-        this.bucketUrl = bucketName + "." + this.domain;
-        this.imageName = "emiratesa380.jpg";
-        this.fullPathToImage = pathToTestFolder + "\\" + imageName;
-        this.prefixObjectDownloaded = "downloaded";
-        this.credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
 
-        this.bucketManager = new AwsDataObjectHelperImpl(credentialsProvider, bucketUrl);
+        bucketName = dotenv.get("AWS_BUCKET");
+        objectName = "test-image.png";
+        testImagePath = Paths.get("src", "test", "resources", objectName);
+        downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
+        credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
+        bucketManager = new AwsDataObjectHelperImpl(credentialsProvider, bucketName);
     }
 
     @Test
-     void CreateObject_CreateNewBucket_Success() {
-        assertFalse(this.bucketManager.Exists(bucketUrl));
-
-        this.bucketManager.Create(bucketUrl);
-
-        assertTrue(this.bucketManager.Exists(bucketUrl));
-    }
-
-    @Test
-    void CreateObject_CreateObjectWithExistingBucket_Success()
-    {
+    void createObject_CreateObjectWithExistingBucket_Success() {
         //given
-        String fileName = this.imageName;
-        String objectUrl = this.bucketUrl + "/" + this.imageName;
-        this.bucketManager.Create(this.bucketUrl);
-        
-        assertTrue(this.bucketManager.Exists(this.bucketUrl));
-        assertFalse(this.bucketManager.Exists(objectUrl));
+        assertTrue(bucketManager.existsBucket(bucketName));
+        assertFalse(bucketManager.existsObject(objectName));
 
         //when
-        this.bucketManager.Create(objectUrl, this.pathToTestFolder + "//" + fileName);
+        bucketManager.createObject(objectName, testImagePath);
 
         //then
-        assertTrue(this.bucketManager.Exists(objectUrl));
+        assertTrue(bucketManager.existsObject(objectName));
     }
 
     @Test
-    void CreateObject_CreateObjectBucketNotExist_Success()
-    {
+    void existsBucket_NominalCase_Success() {
         //given
-        String fileName = this.imageName;
-        String objectUrl = this.bucketUrl + "/" + this.imageName;
-        assertFalse(this.bucketManager.Exists(this.bucketUrl));
-        assertFalse(this.bucketManager.Exists(objectUrl));
-
-        //when
-        this.bucketManager.Create(objectUrl, this.pathToTestFolder + "//" + fileName);
-
-        //then
-        assertTrue(this.bucketManager.Exists(objectUrl));
-    }
-
-    @Test
-    void DownloadObject_NominalCase_Success()
-    {
-        //given
-        String objectUrl = bucketUrl + "//" + this.imageName;
-        String destinationFullPath = this.pathToTestFolder + "//" + this.prefixObjectDownloaded + this.imageName;
-        this.bucketManager.Create(objectUrl, this.pathToTestFolder + "//" + this.imageName);
-
-        assertTrue(this.bucketManager.Exists(bucketUrl));
-
-        //when
-        this.bucketManager.DownloadObject(objectUrl, destinationFullPath);
-
-        //then
-        File file = new File(destinationFullPath);
-        assertTrue(file.exists());
-    }
-
-    @Test
-    void Exists_NominalCase_Success()
-    {
-        //given
-        this.bucketManager.Create(this.bucketUrl);
+        String existingBucket = bucketName;
         boolean actualResult;
 
         //when
-        actualResult = this.bucketManager.Exists(bucketUrl);
+        actualResult = bucketManager.existsBucket(existingBucket);
 
         //then
         assertTrue(actualResult);
     }
 
     @Test
-    void Exists_ObjectNotExistBucket_Success()
-    {
+    void existsBucket_NotExistBucket_Success() {
         //given
-        String notExistingBucket = "notExistingBucket" + this.domain;
+        String notExistingBucket = "notExistingBucket-" + bucketName;
         boolean actualResult;
 
         //when
-        actualResult = this.bucketManager.Exists(notExistingBucket);
+        actualResult = bucketManager.existsBucket(notExistingBucket);
 
         //then
         assertFalse(actualResult);
     }
 
     @Test
-    void Exists_ObjectNotExistFile_Success()
-    {
+    void existsObject_NominalCase_Success() {
         //given
-        this.bucketManager.Create(this.bucketUrl);
-        String notExistingFile = bucketUrl + "//" + "notExistingFile.jpg";
-        assertTrue(this.bucketManager.Exists(bucketUrl));
+        bucketManager.createObject(objectName, testImagePath);
         boolean actualResult;
 
         //when
-        actualResult = this.bucketManager.Exists(notExistingFile);
+        actualResult = bucketManager.existsObject(objectName);
+
+        //then
+        assertTrue(actualResult);
+    }
+
+    @Test
+    void existsObject_NotExistObject_Success() {
+        //given
+        String notExistingFileName = "notExistingFile.jpg";
+        assertTrue(bucketManager.existsBucket(bucketName));
+        boolean actualResult;
+
+        //when
+        actualResult = bucketManager.existsObject(notExistingFileName);
 
         //then
         assertFalse(actualResult);
     }
 
     @Test
-    void RemoveObject_EmptyBucket_Success()
-    {
+    void removeObject_EmptyBucket_Success() {
         //given
-        this.bucketManager.Create(this.bucketUrl);
-        assertTrue(this.bucketManager.Exists(bucketUrl));
+        assertTrue(bucketManager.existsBucket(bucketName));
+        assertFalse(bucketManager.existsObject(objectName));
 
         //when
-        this.bucketManager.RemoveObject(this.bucketUrl);
+        bucketManager.removeObject(objectName);
 
         //then
-        assertFalse(this.bucketManager.Exists(bucketUrl));
+        assertFalse(bucketManager.existsObject(objectName));
     }
 
     @Test
-    void RemoveObject_NotEmptyBucket_Success()
-    {
+    void removeObject_NotEmptyBucket_Success() {
         //given
-        String fileName = this.imageName;
-        String objectUrl = this.bucketUrl + "/" + this.imageName;
-        this.bucketManager.Create(this.bucketUrl);
-        this.bucketManager.Create(objectUrl, this.pathToTestFolder + "//" + fileName);
-
-        assertTrue(this.bucketManager.Exists(bucketUrl));
-        assertTrue(this.bucketManager.Exists(objectUrl));
+        assertTrue(bucketManager.existsBucket(bucketName));
+        bucketManager.createObject(objectName, testImagePath);
+        assertTrue(bucketManager.existsObject(objectName));
 
         //when
-        this.bucketManager.RemoveObject(this.bucketUrl);
+        bucketManager.removeObject(objectName);
 
         //then
-        assertFalse(this.bucketManager.Exists(bucketUrl));
+        assertFalse(bucketManager.existsObject(objectName));
+    }
+
+    @Test
+    void downloadObject_NominalCase_Success() {
+        //given
+        bucketManager.createObject(objectName, testImagePath);
+        assertTrue(bucketManager.existsObject(objectName));
+        boolean actualResult;
+
+        //when
+        actualResult = bucketManager.downloadObject(objectName, downloadedImagePath);
+
+        //then
+        assertTrue(actualResult);
+        File file = new File(downloadedImagePath.toUri());
+        assertTrue(file.exists());
+        assertEquals(file.length(), testImagePath.toFile().length());
+    }
+
+    @Test
+    void downloadObject_NotExistObject_Success() {
+        //given
+        assertFalse(bucketManager.existsObject(objectName));
+        boolean actualResult;
+
+        //when
+        actualResult = bucketManager.downloadObject(objectName, downloadedImagePath);
+
+        //then
+        assertFalse(actualResult);
+        File file = new File(downloadedImagePath.toUri());
+        assertFalse(file.exists());
+    }
+
+    @Test
+    void getPresignedUrl_NominalCase_Success() {
+        //given
+        bucketManager.createObject(objectName, testImagePath);
+        assertTrue(bucketManager.existsObject(objectName));
+        String actualResult;
+
+        //when
+        actualResult = bucketManager.getPresignedUrl(objectName);
+
+        //then
+        assertNotNull(actualResult);
     }
 
     @AfterEach
-    void Cleanup(){
-        String destinationFullPath = this.pathToTestFolder + "\\" + this.prefixObjectDownloaded + this.imageName;
-
-        File file = new File(destinationFullPath);
-        if (file.exists())
-        {
-            file.delete();
+    void tearDown() {
+        File file = new File(downloadedImagePath.toUri());
+        if (file.exists()) {
+            System.out.println("Deleting file => " + file.delete());
         }
-
-        this.bucketManager = new AwsDataObjectHelperImpl(this.credentialsProvider, this.bucketUrl);
-        if (this.bucketManager.Exists(bucketUrl))
-        {
-            this.bucketManager.RemoveObject(this.bucketUrl);
+        this.bucketManager = new AwsDataObjectHelperImpl(this.credentialsProvider, this.bucketName);
+        if (this.bucketManager.existsObject(this.objectName)) {
+            this.bucketManager.removeObject(this.objectName);
         }
     }
- }
+}
