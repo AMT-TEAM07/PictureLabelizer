@@ -43,7 +43,7 @@ public class LabelWrapper {
      * @return the content of the label as a string
      */
     public String toString() {
-        return "\"" + name + "\" is detected at " + confidence + "%";
+        return "{Label: " + name + ", Confidence: " + confidence +"}";
     }
 
     /**
