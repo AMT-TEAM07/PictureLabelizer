@@ -99,7 +99,6 @@ class TestAwsDataObjectHelperImpl {
         assertFalse(actualResult);
     }
 
-
     @Test
     void removeObject_EmptyBucket_Success() {
         //given
@@ -141,6 +140,7 @@ class TestAwsDataObjectHelperImpl {
         assertTrue(actualResult);
         File file = new File(downloadedImagePath.toUri());
         assertTrue(file.exists());
+        assertEquals(file.length(), testImagePath.toFile().length());
     }
 
     @Test
@@ -158,6 +158,19 @@ class TestAwsDataObjectHelperImpl {
         assertFalse(file.exists());
     }
 
+    @Test
+    void getPresignedUrl_NominalCase_Success() {
+        //given
+        bucketManager.createObject(objectName, testImagePath);
+        assertTrue(bucketManager.existsObject(objectName));
+        String actualResult;
+
+        //when
+        actualResult = bucketManager.getPresignedUrl(objectName);
+
+        //then
+        assertNotNull(actualResult);
+    }
 
     @AfterEach
     void tearDown() {

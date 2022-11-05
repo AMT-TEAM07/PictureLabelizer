@@ -5,15 +5,20 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.nio.file.Path;
 
 public class AwsDataObjectHelperImpl {
 
+    private ProfileCredentialsProvider credentialsProvider;
     private final S3Client s3;
     private final String bucketName;
 
+
     public AwsDataObjectHelperImpl(ProfileCredentialsProvider credentialsProvider, String bucketName) {
+        this.credentialsProvider = credentialsProvider;
         this.bucketName = bucketName;
         s3 = S3Client.builder()
                 .region(Region.EU_WEST_2)
@@ -76,8 +81,20 @@ public class AwsDataObjectHelperImpl {
         }
     }
 
-    public String getObjectPrivateUrl(String objectName) {
-        // TODO
-        return null;
+    public String getPresignedUrl(String objectName) {
+        try (S3Presigner presigner = S3Presigner.builder()
+                .credentialsProvider(credentialsProvider)
+                .region(Region.EU_WEST_2)
+                .build()) {
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(objectName)
+                    .build();
+            GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(java.time.Duration.ofMinutes(2))
+                    .getObjectRequest(getObjectRequest)
+                    .build();
+            return presigner.presignGetObject(getObjectPresignRequest).url().toString();
+        }
     }
 }
