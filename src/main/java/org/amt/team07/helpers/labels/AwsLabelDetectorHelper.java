@@ -35,17 +35,12 @@ public class AwsLabelDetectorHelper {
      * @return a list of labelWrapper
      * @throws RuntimeException if the image cannot be read
      */
-    public List<LabelWrapper> execute(String imageUri, int nbLabels, double minConfidence) throws RuntimeException {
+    public List<LabelWrapper> execute(String imageUri, int nbLabels, double minConfidence) throws IOException {
         checkNbLabelsAndMinConfidence(nbLabels, minConfidence);
 
-        Image myImage;
-        try {
-            myImage = Image.builder()
-                    .bytes(SdkBytes.fromInputStream(new BufferedInputStream((new URL(imageUri)).openStream())))
-                    .build();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        var myImage = Image.builder()
+                .bytes(SdkBytes.fromInputStream(new BufferedInputStream((new URL(imageUri)).openStream())))
+                .build();
 
         List<Label> awsLabels = getLabelsfromImage(myImage, nbLabels, minConfidence);
         return LabelWrapper.from(awsLabels);

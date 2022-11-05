@@ -1,24 +1,29 @@
 package org.amt.team07.clients;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.amt.team07.helpers.objects.AwsDataObjectHelper;
 import org.amt.team07.helpers.labels.AwsLabelDetectorHelper;
-import software.amazon.awssdk.auth.credentials.*;
+import org.amt.team07.helpers.objects.AwsDataObjectHelper;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AwsCloudClient {
+
+    private static final Logger LOG = Logger.getLogger(AwsCloudClient.class.getName());
+
     private static AwsCloudClient instance;
 
-    private AwsCredentialsProvider credentialsProvider;
+    private final AwsDataObjectHelper dataObjectHelper;
 
-    private AwsDataObjectHelper dataObjectHelper;
-
-    private AwsLabelDetectorHelper labelDetectorHelper;
+    private final AwsLabelDetectorHelper labelDetectorHelper;
 
     private AwsCloudClient() {
         Dotenv dotenv = Dotenv.configure()
@@ -27,7 +32,7 @@ public class AwsCloudClient {
                 .load();
         AwsBasicCredentials credentials = AwsBasicCredentials.create(dotenv.get("AWS_ACCESS_KEY_ID"),
                 dotenv.get("AWS_SECRET_ACCESS_KEY"));
-        credentialsProvider = StaticCredentialsProvider.create(credentials);
+        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
         dataObjectHelper = new AwsDataObjectHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"),
                 dotenv.get("AWS_BUCKET"));
         labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"));
@@ -41,9 +46,10 @@ public class AwsCloudClient {
 
     /**
      * Get a list of labels from a URL of a picture
-     * @param image the image to analyze
-     * @param myName is the name of the file
-     * @param nbLabels the maximum number of labels to return
+     *
+     * @param image         the image to analyze
+     * @param myName        is the name of the file
+     * @param nbLabels      the maximum number of labels to return
      * @param minConfidence the minimum confidence for a label to be returned
      */
     public void analyzeFromURL(String image, String myName, int nbLabels, double minConfidence) throws IOException {
@@ -68,12 +74,13 @@ public class AwsCloudClient {
 
     /**
      * Get a list of labels from an image in base 64
-     * @param image the image to analyze
-     * @param nbLabels the maximum number of labels to return
+     *
+     * @param image         the image to analyze
+     * @param nbLabels      the maximum number of labels to return
      * @param minConfidence the minimum confidence for a label to be returned
      */
     public void analyzeFromBase64(String image, int nbLabels, double minConfidence) {
-        System.out.println(labelDetectorHelper.executeB64(image, nbLabels, minConfidence));
+        LOG.log(Level.INFO, "{0}", labelDetectorHelper.executeB64(image, nbLabels, minConfidence));
     }
 
     public static AwsCloudClient getInstance() {

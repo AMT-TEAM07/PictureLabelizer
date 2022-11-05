@@ -16,8 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestAwsDataObjectHelper {
 
     private AwsDataObjectHelper bucketManager;
-    private AwsCredentialsProvider credentialsProvider;
-    private String region;
     private String bucketName;
     private Path testImagePath;
     private Path downloadedImagePath;
@@ -32,13 +30,13 @@ class TestAwsDataObjectHelper {
 
         AwsBasicCredentials credentials = AwsBasicCredentials
                 .create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
-        credentialsProvider = StaticCredentialsProvider.create(credentials);
+        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
 
-        region = dotenv.get("AWS_DEFAULT_REGION");
+        String region = dotenv.get("AWS_DEFAULT_REGION");
         bucketName = dotenv.get("AWS_BUCKET");
         objectName = "test-image.png";
-        testImagePath = Paths.get("src", "test", "src/main/resources", objectName);
-        downloadedImagePath = Paths.get("src", "test", "src/main/resources", "downloaded-" + objectName);
+        testImagePath = Paths.get("src", "test", "resources", objectName);
+        downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
 
         bucketManager = new AwsDataObjectHelper(credentialsProvider, region, bucketName);
     }
@@ -188,7 +186,6 @@ class TestAwsDataObjectHelper {
         if (file.exists()) {
             System.out.println("Deleting file => " + file.delete());
         }
-        bucketManager = new AwsDataObjectHelper(credentialsProvider, region, bucketName);
         if (bucketManager.existsObject(objectName)) {
             bucketManager.removeObject(objectName);
         }
