@@ -1,6 +1,6 @@
 package org.amt.team07.helpers.labelDetectors;
 
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
@@ -68,7 +68,6 @@ public class AwsLabelDetectorHelper {
         List<Label> awsLabels = getLabelsfromImage(myImage, nbLabels, minConfidence);
         return LabelWrapper.from(awsLabels);
     }
-
 
     /**
      * Checks that the number of labels and the minimum confidence are valid.
