@@ -10,18 +10,20 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 
 import java.nio.file.Path;
 
-public class AwsDataObjectHelperImpl implements DataObjectHelper {
+public class AwsDataObjectHelper implements DataObjectHelper {
 
-    private AwsCredentialsProvider credentialsProvider;
+    private final AwsCredentialsProvider credentialsProvider;
     private final S3Client s3;
+    private final String region;
     private final String bucketName;
 
 
-    public AwsDataObjectHelperImpl(AwsCredentialsProvider credentialsProvider, String bucketName) {
+    public AwsDataObjectHelper(AwsCredentialsProvider credentialsProvider, String region, String bucketName) {
         this.credentialsProvider = credentialsProvider;
         this.bucketName = bucketName;
+        this.region = region;
         s3 = S3Client.builder()
-                .region(Region.EU_WEST_2)
+                .region(Region.of(region))
                 .credentialsProvider(credentialsProvider)
                 .build();
     }
@@ -31,7 +33,6 @@ public class AwsDataObjectHelperImpl implements DataObjectHelper {
                 .bucket(bucketName)
                 .key(objectName)
                 .build();
-
         s3.putObject(objectRequest, RequestBody.fromFile(filePath));
     }
 
@@ -84,7 +85,7 @@ public class AwsDataObjectHelperImpl implements DataObjectHelper {
     public String getPresignedUrl(String objectName) {
         try (S3Presigner presigner = S3Presigner.builder()
                 .credentialsProvider(credentialsProvider)
-                .region(Region.EU_WEST_2)
+                .region(Region.of(region))
                 .build()) {
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)

@@ -4,11 +4,11 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 
-public class AwsLabelDetectorHelperImpl {
+public class AwsLabelDetectorHelper {
 
     private final RekognitionClient rekClient;
 
-    public AwsLabelDetectorHelperImpl(AwsCredentialsProvider credentialsProvider) {
+    public AwsLabelDetectorHelper(AwsCredentialsProvider credentialsProvider) {
         rekClient = RekognitionClient.builder()
                 .region(Region.EU_WEST_2)
                 .credentialsProvider(credentialsProvider)
