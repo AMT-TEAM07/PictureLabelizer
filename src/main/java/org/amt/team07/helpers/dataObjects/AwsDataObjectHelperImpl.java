@@ -1,6 +1,6 @@
 package org.amt.team07.helpers.dataObjects;
 
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -12,12 +12,12 @@ import java.nio.file.Path;
 
 public class AwsDataObjectHelperImpl implements DataObjectHelper {
 
-    private ProfileCredentialsProvider credentialsProvider;
+    private AwsCredentialsProvider credentialsProvider;
     private final S3Client s3;
     private final String bucketName;
 
 
-    public AwsDataObjectHelperImpl(ProfileCredentialsProvider credentialsProvider, String bucketName) {
+    public AwsDataObjectHelperImpl(AwsCredentialsProvider credentialsProvider, String bucketName) {
         this.credentialsProvider = credentialsProvider;
         this.bucketName = bucketName;
         s3 = S3Client.builder()

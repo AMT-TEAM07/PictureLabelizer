@@ -3,7 +3,9 @@ import org.amt.team07.helpers.dataObjects.AwsDataObjectHelperImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -14,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestAwsDataObjectHelperImpl {
 
     private AwsDataObjectHelperImpl bucketManager;
-    private ProfileCredentialsProvider credentialsProvider;
+    private AwsCredentialsProvider credentialsProvider;
     private String bucketName;
     private Path testImagePath;
     private Path downloadedImagePath;
@@ -24,13 +26,15 @@ class TestAwsDataObjectHelperImpl {
     public void setup() {
         Dotenv dotenv = Dotenv.configure()
                 .ignoreIfMissing()
+                .systemProperties()
                 .load();
 
         bucketName = dotenv.get("AWS_BUCKET");
         objectName = "test-image.png";
         testImagePath = Paths.get("src", "test", "resources", objectName);
         downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
-        credentialsProvider = ProfileCredentialsProvider.create(dotenv.get("AWS_PROFILE"));
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
+        credentialsProvider = StaticCredentialsProvider.create(credentials);
         bucketManager = new AwsDataObjectHelperImpl(credentialsProvider, bucketName);
     }
 
