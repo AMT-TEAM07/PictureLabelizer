@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 
 import java.nio.file.Path;
 
-public class AwsDataObjectHelperImpl {
+public class AwsDataObjectHelperImpl implements DataObjectHelper {
 
     private ProfileCredentialsProvider credentialsProvider;
     private final S3Client s3;
