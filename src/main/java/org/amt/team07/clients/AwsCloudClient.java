@@ -5,6 +5,12 @@ import org.amt.team07.helpers.dataObjects.AwsDataObjectHelper;
 import org.amt.team07.helpers.labelDetectors.AwsLabelDetectorHelper;
 import software.amazon.awssdk.auth.credentials.*;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class AwsCloudClient {
     private static AwsCloudClient instance;
 
@@ -25,6 +31,45 @@ public class AwsCloudClient {
         dataObjectHelper = new AwsDataObjectHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"),
                 dotenv.get("AWS_BUCKET"));
         labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider);
+    }
+
+    /**
+     * Get a list of labels from a URL of a picture
+     * @param image the image to analyze
+     * @param myName is the name of the file
+     * @param nbLabels the maximum number of labels to return
+     * @param minConfidence the minimum confidence for a label to be returned
+     */
+    public void rekognitionFromURL(String image, String myName, int nbLabels, double minConfidence) {
+        //Création de la string json
+        StringBuilder json = new StringBuilder("{labels:[");
+        String suffix = "";
+        for (var label : labelDetectorHelper.execute(image, nbLabels, minConfidence)) {
+            json.append(suffix);
+            json.append(label);
+            suffix = ",";
+        }
+        json.append("]}");
+
+        //Ecriture du json dans un fichier
+        String name = myName + ".json";
+        try {
+            Path file = Paths.get(name);
+            Files.writeString(file, json.toString(), StandardCharsets.UTF_8);
+            dataObjectHelper.createObject(name, file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Get a list of labels from an image in base 64
+     * @param image the image to analyze
+     * @param nbLabels the maximum number of labels to return
+     * @param minConfidence the minimum confidence for a label to be returned
+     */
+    public void rekognitionFromBase64(String image, int nbLabels, double minConfidence) {
+        System.out.println(labelDetectorHelper.executeB64(image, nbLabels, minConfidence));
     }
 
     public static AwsCloudClient getInstance() {
