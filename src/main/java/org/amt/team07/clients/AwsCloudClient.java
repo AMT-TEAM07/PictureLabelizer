@@ -22,11 +22,11 @@ public class AwsCloudClient {
     }
 
     public void rekognitionFromURL(String image, int nbLabels, double minConfidence) {
-        System.out.println(labelDetectorHelper.Execute(image, nbLabels, minConfidence));
+        System.out.println(labelDetectorHelper.execute(image, nbLabels, minConfidence));
     }
 
     public void rekognitionFromBase64(String image, int nbLabels, double minConfidence) {
-
+        System.out.println(labelDetectorHelper.executeB64(image, nbLabels, minConfidence));
     }
 
     public static AwsCloudClient getInstance() {
