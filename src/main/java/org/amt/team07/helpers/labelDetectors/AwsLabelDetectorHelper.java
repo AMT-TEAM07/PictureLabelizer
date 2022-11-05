@@ -20,7 +20,7 @@ public class AwsLabelDetectorHelper {
      * Constructor for the AWS label detector helper
      * @param credentialsProvider the credentials provider to use
      */
-    public AwsLabelDetectorHelper(ProfileCredentialsProvider credentialsProvider) {
+    public AwsLabelDetectorHelper(AwsCredentialsProvider credentialsProvider) {
         rekClient = RekognitionClient.builder()
                 .region(Region.EU_WEST_2)
                 .credentialsProvider(credentialsProvider)
