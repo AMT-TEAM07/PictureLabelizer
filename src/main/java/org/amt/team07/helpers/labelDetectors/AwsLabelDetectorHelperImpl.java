@@ -1,10 +1,15 @@
 package org.amt.team07.helpers.labelDetectors;
 
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.*;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.security.InvalidParameterException;
 import java.util.List;
 
 public class AwsLabelDetectorHelperImpl {
@@ -18,37 +23,29 @@ public class AwsLabelDetectorHelperImpl {
                 .build();
     }
 
-    public String Execute(String imageUri, int[] params) {
-        List<Label> list = getLabelsfromImage("f", imageUri);
+    public List<LabelWrapper> Execute(String imageUri, int nbLabels, double minConfidence) {
+        List<Label> awsLabels = getLabelsfromImage(imageUri, nbLabels, minConfidence);
+        return LabelWrapper.from(awsLabels);
     }
 
-    private List<Label> getLabelsfromImage(String bucket, String image) {
+    private List<Label> getLabelsfromImage(String image, int nbLabels, double minConfidence) {
         try {
-            S3Object s3Object = S3Object.builder()
-                    .bucket(bucket)
-                    .name(image)
-                    .build() ;
-
             Image myImage = Image.builder()
-                    .s3Object(s3Object)
+                    .bytes(SdkBytes.fromInputStream(new BufferedInputStream((new URL(image)).openStream())))
                     .build();
 
             DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder()
                     .image(myImage)
-                    .maxLabels(10)
+                    .maxLabels(nbLabels)
+                    .minConfidence((float) minConfidence)
                     .build();
 
             DetectLabelsResponse labelsResponse = rekClient.detectLabels(detectLabelsRequest);
             return labelsResponse.labels();
-            /*System.out.println("Detected labels for the given photo");
-            for (Label label: labels) {
-                System.out.println(label.name() + ": " + label.confidence().toString());
-            }*/
-
         } catch (RekognitionException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
+            throw RekognitionException.builder().message("Error while detecting labels").build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 }
