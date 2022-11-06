@@ -1,5 +1,5 @@
 import io.github.cdimascio.dotenv.Dotenv;
-import org.amt.team07.helpers.dataObjects.AwsDataObjectHelper;
+import org.amt.team07.helpers.objects.AwsDataObjectHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestAwsDataObjectHelper {
 
     private AwsDataObjectHelper bucketManager;
-    private AwsCredentialsProvider credentialsProvider;
-    private String region;
     private String bucketName;
     private Path testImagePath;
     private Path downloadedImagePath;
@@ -32,9 +30,9 @@ class TestAwsDataObjectHelper {
 
         AwsBasicCredentials credentials = AwsBasicCredentials
                 .create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
-        credentialsProvider = StaticCredentialsProvider.create(credentials);
+        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
 
-        region = dotenv.get("AWS_DEFAULT_REGION");
+        String region = dotenv.get("AWS_DEFAULT_REGION");
         bucketName = dotenv.get("AWS_BUCKET");
         objectName = "test-image.png";
         testImagePath = Paths.get("src", "test", "resources", objectName);
@@ -44,7 +42,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void createObject_CreateObjectWithExistingBucket_Success() {
+    void canCreateObjectInExistingBucket() {
         //given
         assertTrue(bucketManager.existsBucket(bucketName));
         assertFalse(bucketManager.existsObject(objectName));
@@ -57,7 +55,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void existsBucket_NominalCase_Success() {
+    void canConfirmBucketExists() {
         //given
         String existingBucket = bucketName;
         boolean actualResult;
@@ -70,7 +68,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void existsBucket_NotExistBucket_Success() {
+    void canConfirmBucketDoesNotExist() {
         //given
         String notExistingBucket = "notExistingBucket-" + bucketName;
         boolean actualResult;
@@ -83,7 +81,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void existsObject_NominalCase_Success() {
+    void canConfirmObjectExists() {
         //given
         bucketManager.createObject(objectName, testImagePath);
         boolean actualResult;
@@ -96,7 +94,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void existsObject_NotExistObject_Success() {
+    void canConfirmObjectDoesNotExist() {
         //given
         String notExistingFileName = "notExistingFile.jpg";
         assertTrue(bucketManager.existsBucket(bucketName));
@@ -110,20 +108,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void removeObject_EmptyBucket_Success() {
-        //given
-        assertTrue(bucketManager.existsBucket(bucketName));
-        assertFalse(bucketManager.existsObject(objectName));
-
-        //when
-        bucketManager.removeObject(objectName);
-
-        //then
-        assertFalse(bucketManager.existsObject(objectName));
-    }
-
-    @Test
-    void removeObject_NotEmptyBucket_Success() {
+    void canRemoveObjectFromNotEmptyBucket() {
         //given
         assertTrue(bucketManager.existsBucket(bucketName));
         bucketManager.createObject(objectName, testImagePath);
@@ -137,7 +122,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void downloadObject_NominalCase_Success() {
+    void canDownloadExistingObject() {
         //given
         bucketManager.createObject(objectName, testImagePath);
         assertTrue(bucketManager.existsObject(objectName));
@@ -154,7 +139,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void downloadObject_NotExistObject_Success() {
+    void returnFalseWhenDownloadingNotExistingObject() {
         //given
         assertFalse(bucketManager.existsObject(objectName));
         boolean actualResult;
@@ -169,7 +154,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void getPresignedUrl_NominalCase_Success() {
+    void canGeneratePresignedPublicUrlForGivenObjectName() {
         //given
         bucketManager.createObject(objectName, testImagePath);
         assertTrue(bucketManager.existsObject(objectName));
@@ -188,7 +173,6 @@ class TestAwsDataObjectHelper {
         if (file.exists()) {
             System.out.println("Deleting file => " + file.delete());
         }
-        bucketManager = new AwsDataObjectHelper(credentialsProvider, region, bucketName);
         if (bucketManager.existsObject(objectName)) {
             bucketManager.removeObject(objectName);
         }
