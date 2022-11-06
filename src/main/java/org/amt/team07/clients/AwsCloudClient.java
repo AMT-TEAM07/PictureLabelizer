@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class AwsCloudClient {
+public class AwsCloudClient implements CloudClient {
 
     private static final Logger LOG = Logger.getLogger(AwsCloudClient.class.getName());
 
@@ -38,7 +38,7 @@ public class AwsCloudClient {
         labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"));
     }
 
-    public void analyzeFromPath(String objectName, int nbLabels, double minConfidence, Path path) throws IOException {
+    public void analyzeFromPath(Path path, String objectName, int nbLabels, double minConfidence) throws IOException {
         dataObjectHelper.createObject(objectName, path);
         String url = dataObjectHelper.getPresignedUrl(objectName);
         analyzeFromURL(url, objectName, nbLabels, minConfidence);
@@ -47,16 +47,16 @@ public class AwsCloudClient {
     /**
      * Get a list of labels from a URL of a picture
      *
-     * @param image         the image to analyze
-     * @param myName        is the name of the file
+     * @param imageURL      the image to analyze
+     * @param objectName    is the name of the file
      * @param nbLabels      the maximum number of labels to return
      * @param minConfidence the minimum confidence for a label to be returned
      */
-    public void analyzeFromURL(String image, String myName, int nbLabels, double minConfidence) throws IOException {
+    public void analyzeFromURL(String imageURL, String objectName, int nbLabels, double minConfidence) throws IOException {
         //Création de la string json
         StringBuilder json = new StringBuilder("{labels:[");
         String suffix = "";
-        for (var label : labelDetectorHelper.execute(image, nbLabels, minConfidence)) {
+        for (var label : labelDetectorHelper.execute(imageURL, nbLabels, minConfidence)) {
             json.append(suffix);
             json.append(label);
             suffix = ",";
@@ -64,7 +64,7 @@ public class AwsCloudClient {
         json.append("]}");
 
         //Ecriture du json dans un fichier
-        String name = myName + ".json";
+        String name = objectName + ".json";
 
         Path path = Paths.get(name);
         Files.writeString(path, json.toString(), StandardCharsets.UTF_8);
@@ -75,12 +75,12 @@ public class AwsCloudClient {
     /**
      * Get a list of labels from an image in base 64
      *
-     * @param image         the image to analyze
+     * @param imageB64      the image to analyze
      * @param nbLabels      the maximum number of labels to return
      * @param minConfidence the minimum confidence for a label to be returned
      */
-    public void analyzeFromBase64(String image, int nbLabels, double minConfidence) {
-        LOG.log(Level.INFO, "{0}", labelDetectorHelper.executeB64(image, nbLabels, minConfidence));
+    public void analyzeFromBase64(String imageB64, int nbLabels, double minConfidence) {
+        LOG.log(Level.INFO, "{0}", labelDetectorHelper.executeB64(imageB64, nbLabels, minConfidence));
     }
 
     public static AwsCloudClient getInstance() {

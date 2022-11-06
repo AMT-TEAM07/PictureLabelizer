@@ -12,12 +12,13 @@ import java.nio.ByteBuffer;
 import java.security.InvalidParameterException;
 import java.util.List;
 
-public class AwsLabelDetectorHelper {
+public class AwsLabelDetectorHelper implements LabelDetectorHelper {
 
     private final RekognitionClient rekClient;
 
     /**
      * Constructor for the AWS label detector helper
+     *
      * @param credentialsProvider the credentials provider to use
      */
     public AwsLabelDetectorHelper(AwsCredentialsProvider credentialsProvider, String region) {
@@ -29,8 +30,9 @@ public class AwsLabelDetectorHelper {
 
     /**
      * Detects labels in an image stored in an S3 bucket.
-     * @param imageUri url on the image
-     * @param nbLabels maximum number of labels to return
+     *
+     * @param imageUri      url on the image
+     * @param nbLabels      maximum number of labels to return
      * @param minConfidence minimum confidence for a label to be returned
      * @return a list of labelWrapper
      * @throws RuntimeException if the image cannot be read
@@ -38,35 +40,37 @@ public class AwsLabelDetectorHelper {
     public List<LabelWrapper> execute(String imageUri, int nbLabels, double minConfidence) throws IOException {
         checkNbLabelsAndMinConfidence(nbLabels, minConfidence);
 
-        var myImage = Image.builder()
+        var image = Image.builder()
                 .bytes(SdkBytes.fromInputStream(new BufferedInputStream((new URL(imageUri)).openStream())))
                 .build();
 
-        List<Label> awsLabels = getLabelsfromImage(myImage, nbLabels, minConfidence);
+        List<Label> awsLabels = getLabelsfromImage(image, nbLabels, minConfidence);
         return LabelWrapper.from(awsLabels);
     }
 
     /**
      * Detects labels in an image in base 64.
-     * @param imageB64 base 64 encoded image
-     * @param nbLabels maximum number of labels to return
+     *
+     * @param imageB64      base 64 encoded image
+     * @param nbLabels      maximum number of labels to return
      * @param minConfidence minimum confidence for a label to be returned
      * @return a list of LabelWrapper
      */
     public List<LabelWrapper> executeB64(String imageB64, int nbLabels, double minConfidence) {
         checkNbLabelsAndMinConfidence(nbLabels, minConfidence);
 
-        Image myImage = Image.builder()
+        var image = Image.builder()
                 .bytes(SdkBytes.fromByteBuffer(ByteBuffer.wrap(java.util.Base64.getDecoder().decode(imageB64))))
                 .build();
 
-        List<Label> awsLabels = getLabelsfromImage(myImage, nbLabels, minConfidence);
+        List<Label> awsLabels = getLabelsfromImage(image, nbLabels, minConfidence);
         return LabelWrapper.from(awsLabels);
     }
 
     /**
      * Checks that the number of labels and the minimum confidence are valid.
-     * @param nbLabels maximum number of labels
+     *
+     * @param nbLabels      maximum number of labels
      * @param minConfidence minimum confidence for a label
      * @throws InvalidParameterException if the number of labels is negative or the minimum confidence is not between 0 and 100
      */
@@ -78,17 +82,17 @@ public class AwsLabelDetectorHelper {
             throw new InvalidParameterException("minConfidence must be between 0 and 100");
         }
     }
-
-
+    
     /**
      * Detects labels in an image.
-     * @param myImage the image
-     * @param nbLabels maximum number of labels to return
+     *
+     * @param myImage       the image
+     * @param nbLabels      maximum number of labels to return
      * @param minConfidence minimum confidence for a label to be returned
      * @return a list of AWS labels
      * @throws RekognitionException if the image cannot be read
      */
-    private List<Label> getLabelsfromImage(Image myImage, int nbLabels, double minConfidence) throws RekognitionException{
+    private List<Label> getLabelsfromImage(Image myImage, int nbLabels, double minConfidence) throws RekognitionException {
         try {
 
             DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder()
