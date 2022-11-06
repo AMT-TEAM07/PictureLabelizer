@@ -17,7 +17,6 @@ public class AwsDataObjectHelper implements DataObjectHelper {
     private final String region;
     private final String bucketName;
 
-
     public AwsDataObjectHelper(AwsCredentialsProvider credentialsProvider, String region, String bucketName) {
         this.credentialsProvider = credentialsProvider;
         this.bucketName = bucketName;
@@ -26,14 +25,6 @@ public class AwsDataObjectHelper implements DataObjectHelper {
                 .region(Region.of(region))
                 .credentialsProvider(credentialsProvider)
                 .build();
-    }
-
-    public void createObject(String objectName, Path filePath) {
-        PutObjectRequest objectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(objectName)
-                .build();
-        s3.putObject(objectRequest, RequestBody.fromFile(filePath));
     }
 
     public boolean existsBucket(String bucketName) {
@@ -46,6 +37,32 @@ public class AwsDataObjectHelper implements DataObjectHelper {
         } catch (NoSuchBucketException e) {
             return false;
         }
+    }
+
+    public void createBucket(String bucketName) {
+        if (!existsBucket(bucketName)) {
+            CreateBucketRequest createBucketRequest = CreateBucketRequest.builder()
+                    .bucket(bucketName)
+                    .build();
+            s3.createBucket(createBucketRequest);
+        }
+    }
+
+    public void removeBucket(String bucketName) {
+        if (existsBucket(bucketName)) {
+            DeleteBucketRequest deleteBucketRequest = DeleteBucketRequest.builder()
+                    .bucket(bucketName)
+                    .build();
+            s3.deleteBucket(deleteBucketRequest);
+        }
+    }
+
+    public void createObject(String objectName, Path filePath) {
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(objectName)
+                .build();
+        s3.putObject(objectRequest, RequestBody.fromFile(filePath));
     }
 
     public boolean existsObject(String objectName) {
