@@ -41,7 +41,7 @@ et la documentation utilisée pour implémenter notre projet.
 ## Prérequis
 
 - [Java 17 (LTS)](https://adoptium.net/temurin/releases)
-- [Maven](https://adoptium.net/temurin/releases)
+- [Maven 3.8](https://maven.apache.org/download.cgi)
 
 Optionnel mais fortement recommandé:
 
@@ -53,13 +53,11 @@ Optionnel mais fortement recommandé:
 
 - AWS CLI
     - [AWS CLI Installation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-    - [AWS CLI Setup](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html)
+    - [AWS CLI Configuration](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html)
 
 Optionnel mais fortement recommandé:
 
 - [AWS Toolkit](https://docs.aws.amazon.com/toolkit-for-jetbrains/latest/userguide/welcome.html)
-
-Tout d'abord, il faut un [credential AWS](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
 
 Les credentials doivent figurer dans le fichier `.env` à la racine du projet avec les variables d'environnement
 suivantes:
