@@ -2,17 +2,39 @@
 
 ## Collaborateurs
 
-* **Jonathan Friedli** : Travaille sur la partie labelisation des images et création de la suite de tests.
+### Product Owners
 
-* **Lazar Pavicevic** : Travaille sur la partie du stockage des images et documentation du repository.
+* **[Nicolas Glassey](https://github.com/NicolasGlassey)** : Enseignant pour le cours AMT à l'HEIG-VD
+
+
+* **[Adrien Allemand](https://github.com/AdrienAllemand)** : Assistant pour le cours AMT à l'HEIG-VD
+
+### Développeurs
+
+* **[Jonathan Friedli](https://github.com/Marinlestylo)** : Etudiant en troisième année à l'HEIG-VD en ingénierie logicielle. Responsable de
+  l'implémentation
+  de création de labels.
+
+
+* **[Lazar Pavicevic](https://github.com/Lazzzer)** : Etudiant en troisième année à l'HEIG-VD en ingénierie logicielle. Responsable de
+  l'implémentation
+  de manipulation de data objects.
 
 ## Description
 
-Ce projet est une application en ligne de commande Java permettant de labéliser en utilisant des services clouds.
+Ce projet est une application Java permettant de détecter des labels sur une image fournie. Il s'agit d'une application
+pensée pour être découpée en plusieurs
+micro-services et être capable d'utiliser plusieurs providers clouds pour la reconnaissance d'images et le stockage des
+données.
 
-Providers cloud supportés :
+### Wiki
 
-- [x] [AWS](https://aws.amazon.com/fr/) (développement en cours)
+Le [wiki](https://github.com/AMT-TEAM07/PictureLabelizer/wiki) du projet regroupe toutes les informations nécessaires pour comprendre notre méthodologie de travail, nos choix
+et la documentation utilisée pour implémenter notre projet.
+
+### Providers cloud supportés
+
+- [x] [AWS](https://aws.amazon.com/fr/) (🚧 développement en cours 🚧)
 - [ ] [Azure](https://azure.microsoft.com/fr-fr/)
 - [ ] [Google Cloud](https://cloud.google.com/?hl=fr)
 
@@ -90,6 +112,8 @@ mvn package
 # Lancer l'application
 java -jar target/*.jar
 ```
+
 > **Warning**  
-> Le fichier ``.env`` doit se trouver au même niveau que l'appel de la commande ``java -jar``. 
-> Il est d'ailleurs possible d'omettre l'utilisation de ce fichier si les variables sont chargées dans l'environnement de la session actuelle.
+> Le fichier ``.env`` doit se trouver au même niveau que l'appel de la commande ``java -jar``.
+> Il est d'ailleurs possible d'omettre l'utilisation de ce fichier si les variables sont chargées dans l'environnement
+> de la session actuelle.
