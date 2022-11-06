@@ -14,7 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestLabelDetector {
+class TestAwsLabelDetector {
     private AwsLabelDetectorHelper labelDetectorHelper;
 
     @BeforeEach
