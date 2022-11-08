@@ -146,7 +146,7 @@ java -jar *.jar
 
 Le résultat final devrait produire :
 
-* Un fichier `montreux.jpg` et un fichier `montreux.jpg.json` dans le bucket S3 issue de la détection du fichier local.
+* Un fichier `montreux.jpeg` et un fichier `montreux.jpeg.json` dans le bucket S3 issue de la détection du fichier local.
 
 * Un fichier `new-york.json` dans le bucket S3 issu de la détection de l'image à partir de l'URL.
 
