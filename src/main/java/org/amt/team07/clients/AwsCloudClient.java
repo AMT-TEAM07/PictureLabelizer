@@ -80,7 +80,7 @@ public class AwsCloudClient implements CloudClient {
      * @param minConfidence the minimum confidence for a label to be returned
      */
     public void analyzeFromBase64(String imageB64, int nbLabels, double minConfidence) {
-        LOG.log(Level.INFO, "{0}", labelDetectorHelper.executeB64(imageB64, nbLabels, minConfidence));
+        LOG.log(Level.INFO, "{0}", "Analyse en mode base 64 terminée. Voici les résultats : " + labelDetectorHelper.executeB64(imageB64, nbLabels, minConfidence));
     }
 
     public static AwsCloudClient getInstance() {

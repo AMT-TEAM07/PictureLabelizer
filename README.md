@@ -11,12 +11,14 @@
 
 ### Développeurs
 
-* **[Jonathan Friedli](https://github.com/Marinlestylo)** : Etudiant en troisième année à l'HEIG-VD en ingénierie logicielle. Responsable de
+* **[Jonathan Friedli](https://github.com/Marinlestylo)** : Etudiant en troisième année à l'HEIG-VD en ingénierie
+  logicielle. Responsable de
   l'implémentation
   de création de labels.
 
 
-* **[Lazar Pavicevic](https://github.com/Lazzzer)** : Etudiant en troisième année à l'HEIG-VD en ingénierie logicielle. Responsable de
+* **[Lazar Pavicevic](https://github.com/Lazzzer)** : Etudiant en troisième année à l'HEIG-VD en ingénierie logicielle.
+  Responsable de
   l'implémentation
   de manipulation de data objects.
 
@@ -29,7 +31,8 @@ données.
 
 ### Wiki
 
-Le [wiki](https://github.com/AMT-TEAM07/PictureLabelizer/wiki) du projet regroupe toutes les informations nécessaires pour comprendre notre méthodologie de travail, nos choix
+Le [wiki](https://github.com/AMT-TEAM07/PictureLabelizer/wiki) du projet regroupe toutes les informations nécessaires
+pour comprendre notre méthodologie de travail, nos choix
 et la documentation utilisée pour implémenter notre projet.
 
 ### Providers cloud supportés
@@ -115,3 +118,36 @@ java -jar target/*.jar
 > Le fichier ``.env`` doit se trouver au même niveau que l'appel de la commande ``java -jar``.
 > Il est d'ailleurs possible d'omettre l'utilisation de ce fichier si les variables sont chargées dans l'environnement
 > de la session actuelle.
+
+## Test de validation
+
+Pour l'étape actuelle du projet, le serveur d'intégration dispose d'un fichier `jar` lançant automatiquement
+trois détections de labels. Une prenant un fichier local (ici `montreux.jpg` au même niveau que le `jar`), une prenant
+une URL d'une image et une dernière utilisant un image en `base64`.
+
+La structure sur le serveur d'intégration :
+
+```bash
+~/
+|- /picture-labelizer
+   |- .env
+   |- montreux.jpg
+   |- PictureLabelizer-1.0-SNAPSHOT.jar
+```
+
+Dans `picture-labelizer`, il faut lancer la commande suivante :
+
+```bash
+java -jar PictureLabelizer-1.0-SNAPSHOT.jar
+
+# ou plus simplement
+java -jar *.jar
+```
+
+Le résultat final devrait produire :
+
+* Un fichier `montreux.jpg` et un fichier `montreux.jpg.json` dans le bucket S3 issue de la détection du fichier local.
+
+* Un fichier `new-york.json` dans le bucket S3 issu de la détection de l'image à partir de l'URL.
+
+* Un log s'affichant sur la console issu de la détection sur l'image en `base64`.
