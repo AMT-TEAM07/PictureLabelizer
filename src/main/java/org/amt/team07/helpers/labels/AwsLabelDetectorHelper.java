@@ -16,11 +16,6 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
 
     private final RekognitionClient rekClient;
 
-    /**
-     * Constructor for the AWS label detector helper
-     *
-     * @param credentialsProvider the credentials provider to use
-     */
     public AwsLabelDetectorHelper(AwsCredentialsProvider credentialsProvider, String region) {
         rekClient = RekognitionClient.builder()
                 .region(Region.of(region))
@@ -28,15 +23,6 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
                 .build();
     }
 
-    /**
-     * Detects labels in an image stored in an S3 bucket.
-     *
-     * @param imageUri      url on the image
-     * @param nbLabels      maximum number of labels to return
-     * @param minConfidence minimum confidence for a label to be returned
-     * @return a list of labelWrapper
-     * @throws RuntimeException if the image cannot be read
-     */
     public List<LabelWrapper> execute(String imageUri, int nbLabels, double minConfidence) throws IOException {
         checkNbLabelsAndMinConfidence(nbLabels, minConfidence);
 
@@ -48,14 +34,6 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
         return LabelWrapper.from(awsLabels);
     }
 
-    /**
-     * Detects labels in an image in base 64.
-     *
-     * @param imageB64      base 64 encoded image
-     * @param nbLabels      maximum number of labels to return
-     * @param minConfidence minimum confidence for a label to be returned
-     * @return a list of LabelWrapper
-     */
     public List<LabelWrapper> executeB64(String imageB64, int nbLabels, double minConfidence) {
         checkNbLabelsAndMinConfidence(nbLabels, minConfidence);
 
@@ -67,13 +45,6 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
         return LabelWrapper.from(awsLabels);
     }
 
-    /**
-     * Checks that the number of labels and the minimum confidence are valid.
-     *
-     * @param nbLabels      maximum number of labels
-     * @param minConfidence minimum confidence for a label
-     * @throws InvalidParameterException if the number of labels is negative or the minimum confidence is not between 0 and 100
-     */
     private void checkNbLabelsAndMinConfidence(int nbLabels, double minConfidence) throws InvalidParameterException {
         if (nbLabels < 1) {
             throw new InvalidParameterException("nbLabels must be at least 1");
@@ -82,16 +53,7 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
             throw new InvalidParameterException("minConfidence must be between 0 and 100");
         }
     }
-    
-    /**
-     * Detects labels in an image.
-     *
-     * @param myImage       the image
-     * @param nbLabels      maximum number of labels to return
-     * @param minConfidence minimum confidence for a label to be returned
-     * @return a list of AWS labels
-     * @throws RekognitionException if the image cannot be read
-     */
+
     private List<Label> getLabelsfromImage(Image myImage, int nbLabels, double minConfidence) throws RekognitionException {
         try {
 
