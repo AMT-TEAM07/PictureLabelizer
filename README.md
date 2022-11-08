@@ -131,7 +131,7 @@ La structure sur le serveur d'intégration :
 ~/
 |- /picture-labelizer
    |- .env
-   |- montreux.jpg
+   |- montreux.jpeg
    |- PictureLabelizer-1.0-SNAPSHOT.jar
 ```
 
