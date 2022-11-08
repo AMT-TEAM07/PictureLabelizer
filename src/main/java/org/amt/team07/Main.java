@@ -8,14 +8,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
-    private static final Logger LOG = Logger.getLogger(AwsCloudClient.class.getName());
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
     public static void main(String[] args) throws IOException {
         AwsCloudClient client = AwsCloudClient.getInstance();
 
 
         LOG.log(Level.INFO, "{0}", "Début de l'analyse depuis un fichier local :");
         String objectName = "montreux.jpeg";
-        client.analyzeFromPath(Paths.get("src/main/resources", objectName), objectName, 10, 99.);
+        client.analyzeFromPath(Paths.get(objectName), objectName, 10, 99.);
         LOG.log(Level.INFO, "{0}", "L'analyse depuis le fichier local est terminée. " +
                 "Les résultats ainsi que l'image sont disponibles dans le bucket S3.\n");
 
