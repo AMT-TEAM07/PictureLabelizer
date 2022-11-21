@@ -90,6 +90,8 @@ vi .env
 
 2. Installer les dépendances
 
+> TODO votre commande run les tests ce qui n'est pas désirable à cette étape
+
 ```bash
 mvn clean install
 ```
@@ -151,3 +153,10 @@ Le résultat final devrait produire :
 * Un fichier `new-york.jpg.json` dans le bucket S3 issu de la détection de l'image à partir de l'URL.
 
 * Un log s'affichant sur la console issu de la détection sur l'image en `base64`.
+
+
+## Misc
+
+> TODO vous avez commit sur main alors que vous dites qu'elle est protégée
+
+> TODO Un point bonus pour avoir ajouté l'assistant au projet (C'était demandé mais seulement 2 groupes l'ont fait -> bonus)

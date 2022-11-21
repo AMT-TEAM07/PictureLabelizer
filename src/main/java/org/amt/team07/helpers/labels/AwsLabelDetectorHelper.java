@@ -27,6 +27,8 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
         checkNbLabelsAndMinConfidence(nbLabels, minConfidence);
 
         var image = Image.builder()
+                // TODO on attendait que vous utilisiez la fonctionalité du AWS SDK permettant
+                // d'aller lire l'image directement dans le S3 sans la stream.
                 .bytes(SdkBytes.fromInputStream(new BufferedInputStream((new URL(imageUri)).openStream())))
                 .build();
 
@@ -54,7 +56,8 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
         }
     }
 
-    private List<Label> getLabelsfromImage(Image myImage, int nbLabels, double minConfidence) throws RekognitionException {
+    private List<Label> getLabelsfromImage(Image myImage, int nbLabels, double minConfidence)
+            throws RekognitionException {
         try {
 
             DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder()
