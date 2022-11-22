@@ -40,7 +40,6 @@ public class AwsDataObjectHelper implements DataObjectHelper {
         }
     }
 
-    //TODO REVIEW Remove all bucket mention from you public method. Everything is an object.
     public void createRootObject(String rootObjectName) {
         if (!existsRootObject(rootObjectName)) {
             CreateBucketRequest createBucketRequest = CreateBucketRequest.builder()
