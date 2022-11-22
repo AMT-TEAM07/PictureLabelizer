@@ -5,7 +5,7 @@ import java.nio.file.Path;
 public interface DataObjectHelper {
     void createObject(String objectName, Path filePath);
 
-    boolean existsBucket(String bucketName);
+    boolean existsRootObject(String rootObjectName);
 
     boolean existsObject(String objectName);
 

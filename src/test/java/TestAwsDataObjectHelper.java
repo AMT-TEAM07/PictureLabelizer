@@ -46,7 +46,7 @@ class TestAwsDataObjectHelper {
     @Test
     void canCreateObjectInExistingBucket() {
         //given
-        assertTrue(bucketManager.existsBucket(bucketName));
+        assertTrue(bucketManager.existsRootObject(bucketName));
         assertFalse(bucketManager.existsObject(objectName));
 
         //when
@@ -63,7 +63,7 @@ class TestAwsDataObjectHelper {
         boolean actualResult;
 
         //when
-        actualResult = bucketManager.existsBucket(existingBucket);
+        actualResult = bucketManager.existsRootObject(existingBucket);
 
         //then
         assertTrue(actualResult);
@@ -76,7 +76,7 @@ class TestAwsDataObjectHelper {
         boolean actualResult;
 
         //when
-        actualResult = bucketManager.existsBucket(notExistingBucket);
+        actualResult = bucketManager.existsRootObject(notExistingBucket);
 
         //then
         assertFalse(actualResult);
@@ -99,7 +99,7 @@ class TestAwsDataObjectHelper {
     void canConfirmObjectDoesNotExist() {
         //given
         String notExistingFileName = "notExistingFile.jpg";
-        assertTrue(bucketManager.existsBucket(bucketName));
+        assertTrue(bucketManager.existsRootObject(bucketName));
         boolean actualResult;
 
         //when
@@ -112,7 +112,7 @@ class TestAwsDataObjectHelper {
     @Test
     void canRemoveObjectFromNotEmptyBucket() {
         //given
-        assertTrue(bucketManager.existsBucket(bucketName));
+        assertTrue(bucketManager.existsRootObject(bucketName));
         bucketManager.createObject(objectName, testImagePath);
         assertTrue(bucketManager.existsObject(objectName));
 
