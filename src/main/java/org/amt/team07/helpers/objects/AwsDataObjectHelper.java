@@ -1,5 +1,6 @@
 package org.amt.team07.helpers.objects;
 
+import org.amt.team07.Main;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -9,10 +10,13 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AwsDataObjectHelper implements DataObjectHelper {
 
     private final AwsCredentialsProvider credentialsProvider;
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
     private final S3Client s3;
     private final String region;
     private final String bucketName;
@@ -36,6 +40,7 @@ public class AwsDataObjectHelper implements DataObjectHelper {
             return true;
         } catch (NoSuchBucketException e) {
             //TODO REVIEW Either catching, or returning, but not this way
+            LOG.log(Level.INFO, "{0}", e.getMessage());
             return false;
         }
     }
@@ -76,6 +81,7 @@ public class AwsDataObjectHelper implements DataObjectHelper {
             s3.headObject(headObjectRequest);
             return true;
         } catch (NoSuchKeyException e) {
+            LOG.log(Level.INFO, "{0}", e.getMessage());
             return false;
         }
     }
@@ -97,6 +103,7 @@ public class AwsDataObjectHelper implements DataObjectHelper {
             s3.getObject(getObjectRequest, downloadedImagePath);
             return true;
         } catch (NoSuchKeyException e) {
+            LOG.log(Level.INFO, "{0}", e.getMessage());
             return false;
         }
     }
