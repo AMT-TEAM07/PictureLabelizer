@@ -90,10 +90,8 @@ vi .env
 
 2. Installer les dépendances
 
-> TODO votre commande run les tests ce qui n'est pas désirable à cette étape
-
 ```bash
-mvn clean install
+mvn clean install -DskipTests
 ```
 
 3. Lancer les tests unitaires
