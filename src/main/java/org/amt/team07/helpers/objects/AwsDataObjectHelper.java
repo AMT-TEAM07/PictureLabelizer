@@ -35,10 +35,12 @@ public class AwsDataObjectHelper implements DataObjectHelper {
             s3.headBucket(headBucketRequest);
             return true;
         } catch (NoSuchBucketException e) {
+            //TODO REVIEW Either catching, or returning, but not this way
             return false;
         }
     }
 
+    //TODO REVIEW Remove all bucket mention from you public method. Everything is an object.
     public void createBucket(String bucketName) {
         if (!existsBucket(bucketName)) {
             CreateBucketRequest createBucketRequest = CreateBucketRequest.builder()
