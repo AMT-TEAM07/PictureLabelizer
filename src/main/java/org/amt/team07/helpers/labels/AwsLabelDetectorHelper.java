@@ -27,10 +27,6 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
         checkNbLabelsAndMinConfidence(nbLabels, minConfidence);
 
         var image = Image.builder()
-                // TODO on attendait que vous utilisiez la fonctionalité du AWS SDK permettant
-                // d'aller lire l'image directement dans le S3 sans la stream.
-
-                //TODO Si on doit faire ça, check ce lien https://docs.aws.amazon.com/rekognition/latest/dg/images-s3.html
                 .bytes(SdkBytes.fromInputStream(new BufferedInputStream((new URL(imageUri)).openStream())))
                 .build();
 
