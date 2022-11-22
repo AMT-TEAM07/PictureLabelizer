@@ -27,9 +27,9 @@ public class AwsDataObjectHelper implements DataObjectHelper {
                 .build();
     }
 
-    public boolean existsBucket(String bucketName) {
+    public boolean existsRootObject(String rootObjectName) {
         HeadBucketRequest headBucketRequest = HeadBucketRequest.builder()
-                .bucket(bucketName)
+                .bucket(rootObjectName)
                 .build();
         try {
             s3.headBucket(headBucketRequest);
@@ -41,19 +41,19 @@ public class AwsDataObjectHelper implements DataObjectHelper {
     }
 
     //TODO REVIEW Remove all bucket mention from you public method. Everything is an object.
-    public void createBucket(String bucketName) {
-        if (!existsBucket(bucketName)) {
+    public void createRootObject(String rootObjectName) {
+        if (!existsRootObject(rootObjectName)) {
             CreateBucketRequest createBucketRequest = CreateBucketRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(rootObjectName)
                     .build();
             s3.createBucket(createBucketRequest);
         }
     }
 
-    public void removeBucket(String bucketName) {
-        if (existsBucket(bucketName)) {
+    public void removeRootObject(String rootObjectName) {
+        if (existsRootObject(rootObjectName)) {
             DeleteBucketRequest deleteBucketRequest = DeleteBucketRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(rootObjectName)
                     .build();
             s3.deleteBucket(deleteBucketRequest);
         }
