@@ -3,6 +3,7 @@ import org.amt.team07.helpers.objects.AwsDataObjectHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+//TODO REVIEW Remove all aws dependencies in test class
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -28,6 +29,7 @@ class TestAwsDataObjectHelper {
                 .systemProperties()
                 .load();
 
+        //TODO REVIEW Improvement, would be appreciate to have a config file for testing and another one for prod
         AwsBasicCredentials credentials = AwsBasicCredentials
                 .create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
         AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
