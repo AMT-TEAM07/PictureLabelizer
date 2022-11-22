@@ -15,7 +15,7 @@ class TestAwsLabelDetector {
 
     @BeforeEach
     public void setup() {
-        var configProvider = new AwsConfigProvider();
+        var configProvider = new AwsConfigProvider("TEST_AWS_ACCESS_KEY_ID", "TEST_AWS_SECRET_ACCESS_KEY", "TEST_AWS_DEFAULT_REGION");
         labelDetectorHelper = new AwsLabelDetectorHelper(configProvider);
     }
 

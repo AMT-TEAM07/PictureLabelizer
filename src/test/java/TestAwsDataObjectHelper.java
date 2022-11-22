@@ -30,14 +30,12 @@ class TestAwsDataObjectHelper {
                 .systemProperties()
                 .load();
 
-        //TODO REVIEW Improvement, would be appreciate to have a config file for testing and another one for prod
-
-        bucketName = dotenv.get("AWS_BUCKET");
+        bucketName = dotenv.get("TEST_AWS_BUCKET");
         objectName = "test-image.png";
         testImagePath = Paths.get("src", "test", "resources", objectName);
         downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
 
-        var configProvider = new AwsConfigProvider();
+        var configProvider = new AwsConfigProvider("TEST_AWS_ACCESS_KEY_ID", "TEST_AWS_SECRET_ACCESS_KEY", "TEST_AWS_DEFAULT_REGION");
         bucketManager = new AwsDataObjectHelper(configProvider, bucketName);
     }
 
