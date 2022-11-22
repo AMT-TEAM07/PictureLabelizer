@@ -1,13 +1,10 @@
 import io.github.cdimascio.dotenv.Dotenv;
 import org.amt.team07.Main;
 import org.amt.team07.helpers.objects.AwsDataObjectHelper;
+import org.amt.team07.providers.AwsConfigProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-//TODO REVIEW Remove all aws dependencies in test class
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -34,17 +31,14 @@ class TestAwsDataObjectHelper {
                 .load();
 
         //TODO REVIEW Improvement, would be appreciate to have a config file for testing and another one for prod
-        AwsBasicCredentials credentials = AwsBasicCredentials
-                .create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
-        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
 
-        String region = dotenv.get("AWS_DEFAULT_REGION");
         bucketName = dotenv.get("AWS_BUCKET");
         objectName = "test-image.png";
         testImagePath = Paths.get("src", "test", "resources", objectName);
         downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
 
-        bucketManager = new AwsDataObjectHelper(credentialsProvider, region, bucketName);
+        var configProvider = new AwsConfigProvider();
+        bucketManager = new AwsDataObjectHelper(configProvider, bucketName);
     }
 
     @Test

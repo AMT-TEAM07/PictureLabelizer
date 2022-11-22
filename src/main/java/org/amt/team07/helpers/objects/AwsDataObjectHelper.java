@@ -1,9 +1,7 @@
 package org.amt.team07.helpers.objects;
 
-import org.amt.team07.Main;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import org.amt.team07.providers.AwsConfigProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -15,19 +13,17 @@ import java.util.logging.Logger;
 
 public class AwsDataObjectHelper implements DataObjectHelper {
 
-    private final AwsCredentialsProvider credentialsProvider;
-    private static final Logger LOG = Logger.getLogger(Main.class.getName());
+    private final AwsConfigProvider configProvider;
+    private static final Logger LOG = Logger.getLogger(AwsDataObjectHelper.class.getName());
     private final S3Client s3;
-    private final String region;
-    private final String bucketName;
+    private final String rootObjectName;
 
-    public AwsDataObjectHelper(AwsCredentialsProvider credentialsProvider, String region, String bucketName) {
-        this.credentialsProvider = credentialsProvider;
-        this.bucketName = bucketName;
-        this.region = region;
+    public AwsDataObjectHelper(AwsConfigProvider configProvider, String rootObjectName) {
+        this.configProvider = configProvider;
+        this.rootObjectName = rootObjectName;
         s3 = S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(credentialsProvider)
+                .region(configProvider.getRegion())
+                .credentialsProvider(configProvider.getCredentialsProvider())
                 .build();
     }
 
@@ -66,7 +62,7 @@ public class AwsDataObjectHelper implements DataObjectHelper {
 
     public void createObject(String objectName, Path filePath) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(rootObjectName)
                 .key(objectName)
                 .build();
         s3.putObject(objectRequest, RequestBody.fromFile(filePath));
@@ -74,7 +70,7 @@ public class AwsDataObjectHelper implements DataObjectHelper {
 
     public boolean existsObject(String objectName) {
         HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(rootObjectName)
                 .key(objectName)
                 .build();
         try {
@@ -88,7 +84,7 @@ public class AwsDataObjectHelper implements DataObjectHelper {
 
     public void removeObject(String objectName) {
         DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(rootObjectName)
                 .key(objectName)
                 .build();
         s3.deleteObject(deleteObjectRequest);
@@ -96,7 +92,7 @@ public class AwsDataObjectHelper implements DataObjectHelper {
 
     public boolean downloadObject(String objectUrl, Path downloadedImagePath) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(rootObjectName)
                 .key(objectUrl)
                 .build();
         try {
@@ -110,11 +106,11 @@ public class AwsDataObjectHelper implements DataObjectHelper {
 
     public String getPresignedUrl(String objectName) {
         try (S3Presigner presigner = S3Presigner.builder()
-                .credentialsProvider(credentialsProvider)
-                .region(Region.of(region))
+                .credentialsProvider(configProvider.getCredentialsProvider())
+                .region(configProvider.getRegion())
                 .build()) {
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(rootObjectName)
                     .key(objectName)
                     .build();
             GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()

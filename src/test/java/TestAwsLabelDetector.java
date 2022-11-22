@@ -1,12 +1,8 @@
-import io.github.cdimascio.dotenv.Dotenv;
 import org.amt.team07.helpers.labels.AwsLabelDetectorHelper;
 import org.amt.team07.helpers.labels.LabelWrapper;
+import org.amt.team07.providers.AwsConfigProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.services.rekognition.model.RekognitionException;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,21 +15,13 @@ class TestAwsLabelDetector {
 
     @BeforeEach
     public void setup() {
-        Dotenv dotenv = Dotenv.configure()
-                .ignoreIfMissing()
-                .systemProperties()
-                .load();
-
-        AwsBasicCredentials credentials = AwsBasicCredentials
-                .create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
-        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
-
-        labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"));
+        var configProvider = new AwsConfigProvider();
+        labelDetectorHelper = new AwsLabelDetectorHelper(configProvider);
     }
 
     @Test
     void crashIfURLIsInvalid() {
-        assertThrows(RekognitionException.class, () -> labelDetectorHelper.execute("https://www.google.com", 10, 0.5));
+        assertThrows(Exception.class, () -> labelDetectorHelper.execute("https://www.google.com", 10, 0.5));
     }
 
     @Test
