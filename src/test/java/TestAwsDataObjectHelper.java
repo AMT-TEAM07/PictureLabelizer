@@ -42,7 +42,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void canCreateObjectInExistingBucket() {
+    void canCreateObjectInExistingRootObject() {
         //given
         assertTrue(bucketManager.existsRootObject(bucketName));
         assertFalse(bucketManager.existsObject(objectName));
@@ -55,7 +55,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void canConfirmBucketExists() {
+    void canConfirmRootObjectExists() {
         //given
         String existingBucket = bucketName;
         boolean actualResult;
@@ -68,7 +68,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void canConfirmBucketDoesNotExist() {
+    void canConfirmRootObjectDoesNotExist() {
         //given
         String notExistingBucket = "notExistingBucket-" + bucketName;
         boolean actualResult;
@@ -108,7 +108,7 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void canRemoveObjectFromNotEmptyBucket() {
+    void canRemoveObjectFromNotEmptyRootObject() {
         //given
         assertTrue(bucketManager.existsRootObject(bucketName));
         bucketManager.createObject(objectName, testImagePath);
