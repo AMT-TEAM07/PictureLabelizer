@@ -35,7 +35,6 @@ public class AwsDataObjectHelper implements DataObjectHelper {
             s3.headBucket(headBucketRequest);
             return true;
         } catch (NoSuchBucketException e) {
-            //TODO REVIEW Either catching, or returning, but not this way
             LOG.log(Level.INFO, "{0}", e.getMessage());
             return false;
         }
