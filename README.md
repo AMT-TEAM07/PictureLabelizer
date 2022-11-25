@@ -73,6 +73,8 @@ Ensuite, après avoir créé un bucket S3, il faut rajouter son nom dans le fich
 
 - `AWS_BUCKET`
 
+Chaque variable d'environnement a un équivalent avec un préfixe `TEST` qui est utilisé lors des tests locaux et dans la Github Action.
+
 ## Mise en route
 
 Chaque étape de la mise en route est faisable sur l'interface graphique d'IntelliJ ou en ligne de commande.
@@ -91,7 +93,7 @@ vi .env
 2. Installer les dépendances
 
 ```bash
-mvn clean install
+mvn clean install -DskipTests
 ```
 
 3. Lancer les tests unitaires

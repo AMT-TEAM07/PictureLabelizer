@@ -3,9 +3,7 @@ package org.amt.team07.clients;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.amt.team07.helpers.labels.AwsLabelDetectorHelper;
 import org.amt.team07.helpers.objects.AwsDataObjectHelper;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import org.amt.team07.providers.AwsConfigProvider;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,12 +28,9 @@ public class AwsCloudClient implements CloudClient {
                 .ignoreIfMissing()
                 .systemProperties()
                 .load();
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(dotenv.get("AWS_ACCESS_KEY_ID"),
-                dotenv.get("AWS_SECRET_ACCESS_KEY"));
-        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
-        dataObjectHelper = new AwsDataObjectHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"),
-                dotenv.get("AWS_BUCKET"));
-        labelDetectorHelper = new AwsLabelDetectorHelper(credentialsProvider, dotenv.get("AWS_DEFAULT_REGION"));
+        var configProvider = new AwsConfigProvider();
+        dataObjectHelper = new AwsDataObjectHelper(configProvider, dotenv.get("AWS_BUCKET"));
+        labelDetectorHelper = new AwsLabelDetectorHelper(configProvider);
     }
 
     public void analyzeFromPath(Path path, String objectName, int nbLabels, double minConfidence) throws IOException {
