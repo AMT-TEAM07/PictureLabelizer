@@ -1,20 +1,22 @@
 import io.github.cdimascio.dotenv.Dotenv;
+import org.amt.team07.Main;
 import org.amt.team07.helpers.objects.AwsDataObjectHelper;
+import org.amt.team07.providers.AwsConfigProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestAwsDataObjectHelper {
 
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
     private AwsDataObjectHelper bucketManager;
     private String bucketName;
     private Path testImagePath;
@@ -28,23 +30,19 @@ class TestAwsDataObjectHelper {
                 .systemProperties()
                 .load();
 
-        AwsBasicCredentials credentials = AwsBasicCredentials
-                .create(dotenv.get("AWS_ACCESS_KEY_ID"), dotenv.get("AWS_SECRET_ACCESS_KEY"));
-        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(credentials);
-
-        String region = dotenv.get("AWS_DEFAULT_REGION");
-        bucketName = dotenv.get("AWS_BUCKET");
+        bucketName = dotenv.get("TEST_AWS_BUCKET");
         objectName = "test-image.png";
         testImagePath = Paths.get("src", "test", "resources", objectName);
         downloadedImagePath = Paths.get("src", "test", "resources", "downloaded-" + objectName);
 
-        bucketManager = new AwsDataObjectHelper(credentialsProvider, region, bucketName);
+        var configProvider = new AwsConfigProvider("TEST_AWS_ACCESS_KEY_ID", "TEST_AWS_SECRET_ACCESS_KEY", "TEST_AWS_DEFAULT_REGION");
+        bucketManager = new AwsDataObjectHelper(configProvider, bucketName);
     }
 
     @Test
-    void canCreateObjectInExistingBucket() {
+    void canCreateObjectInExistingRootObject() {
         //given
-        assertTrue(bucketManager.existsBucket(bucketName));
+        assertTrue(bucketManager.existsRootObject(bucketName));
         assertFalse(bucketManager.existsObject(objectName));
 
         //when
@@ -55,26 +53,26 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void canConfirmBucketExists() {
+    void canConfirmRootObjectExists() {
         //given
         String existingBucket = bucketName;
         boolean actualResult;
 
         //when
-        actualResult = bucketManager.existsBucket(existingBucket);
+        actualResult = bucketManager.existsRootObject(existingBucket);
 
         //then
         assertTrue(actualResult);
     }
 
     @Test
-    void canConfirmBucketDoesNotExist() {
+    void canConfirmRootObjectDoesNotExist() {
         //given
         String notExistingBucket = "notExistingBucket-" + bucketName;
         boolean actualResult;
 
         //when
-        actualResult = bucketManager.existsBucket(notExistingBucket);
+        actualResult = bucketManager.existsRootObject(notExistingBucket);
 
         //then
         assertFalse(actualResult);
@@ -97,7 +95,7 @@ class TestAwsDataObjectHelper {
     void canConfirmObjectDoesNotExist() {
         //given
         String notExistingFileName = "notExistingFile.jpg";
-        assertTrue(bucketManager.existsBucket(bucketName));
+        assertTrue(bucketManager.existsRootObject(bucketName));
         boolean actualResult;
 
         //when
@@ -108,9 +106,9 @@ class TestAwsDataObjectHelper {
     }
 
     @Test
-    void canRemoveObjectFromNotEmptyBucket() {
+    void canRemoveObjectFromNotEmptyRootObject() {
         //given
-        assertTrue(bucketManager.existsBucket(bucketName));
+        assertTrue(bucketManager.existsRootObject(bucketName));
         bucketManager.createObject(objectName, testImagePath);
         assertTrue(bucketManager.existsObject(objectName));
 
@@ -171,7 +169,7 @@ class TestAwsDataObjectHelper {
     void tearDown() {
         File file = new File(downloadedImagePath.toUri());
         if (file.exists()) {
-            System.out.println("Deleting file => " + file.delete());
+            LOG.log(Level.INFO, "{0}", "Deleting file => " + file.delete());
         }
         if (bucketManager.existsObject(objectName)) {
             bucketManager.removeObject(objectName);

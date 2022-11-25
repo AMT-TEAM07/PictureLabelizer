@@ -1,12 +1,12 @@
 package org.amt.team07.helpers.labels;
 
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import org.amt.team07.providers.AwsConfigProvider;
 import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.rekognition.RekognitionClient;
 import software.amazon.awssdk.services.rekognition.model.*;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.InvalidParameterException;
@@ -16,10 +16,10 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
 
     private final RekognitionClient rekClient;
 
-    public AwsLabelDetectorHelper(AwsCredentialsProvider credentialsProvider, String region) {
+    public AwsLabelDetectorHelper(AwsConfigProvider configProvider) {
         rekClient = RekognitionClient.builder()
-                .region(Region.of(region))
-                .credentialsProvider(credentialsProvider)
+                .region(configProvider.getRegion())
+                .credentialsProvider(configProvider.getCredentialsProvider())
                 .build();
     }
 
@@ -54,9 +54,9 @@ public class AwsLabelDetectorHelper implements LabelDetectorHelper {
         }
     }
 
-    private List<Label> getLabelsfromImage(Image myImage, int nbLabels, double minConfidence) throws RekognitionException {
+    private List<Label> getLabelsfromImage(Image myImage, int nbLabels, double minConfidence)
+            throws RekognitionException {
         try {
-
             DetectLabelsRequest detectLabelsRequest = DetectLabelsRequest.builder()
                     .image(myImage)
                     .maxLabels(nbLabels)

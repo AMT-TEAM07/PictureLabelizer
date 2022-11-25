@@ -73,6 +73,8 @@ Ensuite, après avoir créé un bucket S3, il faut rajouter son nom dans le fich
 
 - `AWS_BUCKET`
 
+Chaque variable d'environnement a un équivalent avec un préfixe `TEST` qui est utilisé lors des tests locaux et dans la Github Action.
+
 ## Mise en route
 
 Chaque étape de la mise en route est faisable sur l'interface graphique d'IntelliJ ou en ligne de commande.
@@ -91,7 +93,7 @@ vi .env
 2. Installer les dépendances
 
 ```bash
-mvn clean install
+mvn clean install -DskipTests
 ```
 
 3. Lancer les tests unitaires
@@ -131,7 +133,7 @@ La structure sur le serveur d'intégration :
 ~/
 |- /picture-labelizer
    |- .env
-   |- montreux.jpg
+   |- montreux.jpeg
    |- PictureLabelizer-1.0-SNAPSHOT.jar
 ```
 
@@ -146,8 +148,8 @@ java -jar *.jar
 
 Le résultat final devrait produire :
 
-* Un fichier `montreux.jpg` et un fichier `montreux.jpg.json` dans le bucket S3 issue de la détection du fichier local.
+* Un fichier `montreux.jpeg` et un fichier `montreux.jpeg.json` dans le bucket S3 issue de la détection du fichier local.
 
-* Un fichier `new-york.json` dans le bucket S3 issu de la détection de l'image à partir de l'URL.
+* Un fichier `new-york.jpg.json` dans le bucket S3 issu de la détection de l'image à partir de l'URL.
 
 * Un log s'affichant sur la console issu de la détection sur l'image en `base64`.
