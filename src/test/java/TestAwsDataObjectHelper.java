@@ -1,5 +1,4 @@
 import io.github.cdimascio.dotenv.Dotenv;
-import org.amt.team07.Main;
 import org.amt.team07.helpers.objects.AwsDataObjectHelper;
 import org.amt.team07.providers.AwsConfigProvider;
 import org.junit.jupiter.api.AfterEach;
@@ -9,14 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TestAwsDataObjectHelper {
 
-    private static final Logger LOG = Logger.getLogger(Main.class.getName());
     private AwsDataObjectHelper bucketManager;
     private String bucketName;
     private Path testImagePath;
@@ -169,7 +165,7 @@ class TestAwsDataObjectHelper {
     void tearDown() {
         File file = new File(downloadedImagePath.toUri());
         if (file.exists()) {
-            LOG.log(Level.INFO, "{0}", "Deleting file => " + file.delete());
+            assertTrue(file.delete());
         }
         if (bucketManager.existsObject(objectName)) {
             bucketManager.removeObject(objectName);
